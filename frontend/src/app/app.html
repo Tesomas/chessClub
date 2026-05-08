@@ -1,0 +1,11 @@
+<nav class="nav">
+  <a class="nav-brand" routerLink="/">♟ ChessClub</a>
+  <div class="nav-links">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+    <a routerLink="/players" routerLinkActive="active">Players</a>
+  </div>
+</nav>
+
+<main class="main">
+  <router-outlet />
+</main>
