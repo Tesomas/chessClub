@@ -1,5 +1,6 @@
 <header class="page-header">
   <h1>Players</h1>
+  <a class="btn-add" routerLink="/players/add">+ Add Player</a>
 </header>
 
 @if (loading()) {
@@ -23,10 +24,10 @@
       @for (player of players(); track player.id) {
         <tr>
           <td class="player-name">{{ player.firstName }} {{ player.lastName }}</td>
-          <td>{{ player.eloRapid }}</td>
-          <td>{{ player.eloBlitz }}</td>
-          <td>{{ player.eloBullet }}</td>
-          <td>{{ player.eloClassical }}</td>
+          <td>{{ player.rapidElo }}</td>
+          <td>{{ player.blitzElo }}</td>
+          <td>{{ player.bulletElo}}</td>
+          <td>{{ player.classicalElo }}</td>
         </tr>
       }
     </tbody>

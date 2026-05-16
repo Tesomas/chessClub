@@ -3,7 +3,7 @@ package org.tesomas.chessclub.model
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
-@Document(collection = "players")
+@Document(collection = "Players")
 data class Player(
     @Id val id: String? = null,
     val firstName: String,
