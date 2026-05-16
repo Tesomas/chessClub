@@ -37,7 +37,7 @@
   }
 }
 
-.player-table {
+.game-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9rem;
@@ -57,11 +57,7 @@
     padding: var(--space-md);
     border-bottom: 1px solid var(--color-border);
     color: var(--color-text);
-
-    &:not(.player-name) {
-      font-variant-numeric: tabular-nums;
-      color: var(--color-text-muted);
-    }
+    vertical-align: middle;
   }
 
   tbody tr {
@@ -71,8 +67,43 @@
       background: var(--color-surface);
     }
   }
+}
 
-  .player-name {
-    font-weight: 600;
-  }
+.date-cell {
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.player-cell {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+}
+
+.player-name {
+  font-weight: 600;
+}
+
+.rating {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.result-cell {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-accent);
+  text-align: center;
+}
+
+.type-cell {
+  color: var(--color-text-muted);
+  text-transform: capitalize;
+}
+
+.time-cell {
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
 }

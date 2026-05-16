@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.tesomas.chessclub.model.Game
+import org.tesomas.chessclub.model.GameCreateRequest
 import org.tesomas.chessclub.service.GameService
 
 @RestController
@@ -21,7 +22,7 @@ class GameController(private val gameService: GameService) {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun create(@RequestBody game: Game): Game = gameService.create(game)
+    fun create(@RequestBody request: GameCreateRequest): Game = gameService.create(request)
 
     @PutMapping("/{id}")
     fun update(@PathVariable id: String, @RequestBody game: Game): ResponseEntity<Game> =

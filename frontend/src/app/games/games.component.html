@@ -1,0 +1,43 @@
+<header class="page-header">
+  <h1>Games</h1>
+  <a class="btn-add" routerLink="/games/add">+ Add Game</a>
+</header>
+
+@if (loading()) {
+  <p class="state-msg">Loading games…</p>
+} @else if (error()) {
+  <p class="state-msg state-error">{{ error() }}</p>
+} @else if (games().length === 0) {
+  <p class="state-msg">No games yet.</p>
+} @else {
+  <table class="game-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>White</th>
+        <th>Result</th>
+        <th>Black</th>
+        <th>Type</th>
+        <th>Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (game of games(); track game.id) {
+        <tr>
+          <td class="date-cell">{{ game.date }}</td>
+          <td class="player-cell">
+            <span class="player-name">{{ game.whitePlayerName }}</span>
+            <span class="rating">{{ game.whitePlayerRating }}</span>
+          </td>
+          <td class="result-cell">{{ resultLabel[game.result] }}</td>
+          <td class="player-cell">
+            <span class="player-name">{{ game.blackPlayerName }}</span>
+            <span class="rating">{{ game.blackPlayerRating }}</span>
+          </td>
+          <td class="type-cell">{{ game.gameType | lowercase }}</td>
+          <td class="time-cell">{{ game.time }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

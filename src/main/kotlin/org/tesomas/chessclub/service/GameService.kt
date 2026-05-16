@@ -3,6 +3,8 @@ package org.tesomas.chessclub.service
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.tesomas.chessclub.model.Game
+import org.tesomas.chessclub.model.GameCreateRequest
+import org.tesomas.chessclub.model.GameType
 import org.tesomas.chessclub.model.Player
 import org.tesomas.chessclub.repository.GameRepository
 import org.tesomas.chessclub.repository.PlayerRepository
@@ -17,9 +19,23 @@ class GameService(
 
     fun findById(id: String): Game? = gameRepository.findByIdOrNull(id)
 
-    fun create(game: Game): Game {
-        val (white, black) = resolvePlayers(game.whitePlayerId, game.blackPlayerId)
-        return gameRepository.save(game.copy(id = null, whitePlayerName = white.fullName, blackPlayerName = black.fullName))
+    fun create(request: GameCreateRequest): Game {
+        val (white, black) = resolvePlayers(request.whitePlayerId, request.blackPlayerId)
+        return gameRepository.save(
+            Game(
+                whitePlayerId = request.whitePlayerId,
+                blackPlayerId = request.blackPlayerId,
+                whitePlayerName = white.fullName,
+                blackPlayerName = black.fullName,
+                whitePlayerRating = white.eloForType(request.gameType),
+                blackPlayerRating = black.eloForType(request.gameType),
+                gameType = request.gameType,
+                result = request.result,
+                time = request.time,
+                date = request.date,
+                pgn = request.pgn
+            )
+        )
     }
 
     fun update(id: String, game: Game): Game? {
@@ -43,4 +59,11 @@ class GameService(
     }
 
     private val Player.fullName get() = "$firstName $lastName"
+
+    private fun Player.eloForType(gameType: GameType): Int = when (gameType) {
+        GameType.RAPID -> rapidElo
+        GameType.BLITZ -> blitzElo
+        GameType.BULLET -> bulletElo
+        GameType.CLASSICAL -> classicalElo
+    }
 }

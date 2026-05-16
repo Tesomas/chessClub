@@ -39,6 +39,9 @@ out/
 ### Kotlin ###
 .kotlin
 
+### Local config ###
+src/main/resources/application-local.properties
+
 ### Angular ###
 frontend/node_modules/
 frontend/dist/
