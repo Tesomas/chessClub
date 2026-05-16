@@ -1,0 +1,109 @@
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-xl);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-lg);
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+  }
+}
+
+.btn-add {
+  background: var(--color-accent);
+  color: #000;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: var(--space-sm) var(--space-md);
+  text-decoration: none;
+  transition: background var(--duration) var(--ease);
+
+  &:hover {
+    background: var(--color-accent-dim);
+    text-decoration: none;
+  }
+}
+
+.state-msg {
+  color: var(--color-text-muted);
+  padding: var(--space-xl) 0;
+
+  &.state-error {
+    color: var(--color-danger);
+  }
+}
+
+.game-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+
+  th {
+    text-align: left;
+    padding: var(--space-sm) var(--space-md);
+    color: var(--color-text-muted);
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  td {
+    padding: var(--space-md);
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text);
+    vertical-align: middle;
+  }
+
+  tbody tr {
+    transition: background var(--duration) var(--ease);
+
+    &:hover {
+      background: var(--color-surface);
+    }
+  }
+}
+
+.date-cell {
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.player-cell {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+}
+
+.player-name {
+  font-weight: 600;
+}
+
+.rating {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.result-cell {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-accent);
+  text-align: center;
+}
+
+.type-cell {
+  color: var(--color-text-muted);
+  text-transform: capitalize;
+}
+
+.time-cell {
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}

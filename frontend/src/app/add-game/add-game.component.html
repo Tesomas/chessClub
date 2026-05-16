@@ -1,0 +1,94 @@
+<header class="page-header">
+  <h1>Add Game</h1>
+</header>
+
+@if (loadingPlayers()) {
+  <p class="state-msg">Loading players…</p>
+} @else {
+  <form class="game-form" [formGroup]="form" (ngSubmit)="submit()">
+
+    <div class="form-section">
+      <h2 class="section-title">Players</h2>
+      <div class="form-row">
+        <div class="field">
+          <label for="whitePlayerId">White ♔</label>
+          <select id="whitePlayerId" formControlName="whitePlayerId">
+            <option value="" disabled>Select player…</option>
+            @for (player of players(); track player.id) {
+              <option [value]="player.id">{{ player.firstName }} {{ player.lastName }}</option>
+            }
+          </select>
+          @if (form.controls.whitePlayerId.invalid && form.controls.whitePlayerId.touched) {
+            <span class="field-error">Required.</span>
+          }
+        </div>
+        <div class="field">
+          <label for="blackPlayerId">Black ♚</label>
+          <select id="blackPlayerId" formControlName="blackPlayerId">
+            <option value="" disabled>Select player…</option>
+            @for (player of players(); track player.id) {
+              <option [value]="player.id">{{ player.firstName }} {{ player.lastName }}</option>
+            }
+          </select>
+          @if (form.controls.blackPlayerId.invalid && form.controls.blackPlayerId.touched) {
+            <span class="field-error">Required.</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2 class="section-title">Game Details</h2>
+      <div class="form-row">
+        <div class="field">
+          <label for="gameType">Type</label>
+          <select id="gameType" formControlName="gameType">
+            <option value="RAPID">Rapid</option>
+            <option value="BLITZ">Blitz</option>
+            <option value="BULLET">Bullet</option>
+            <option value="CLASSICAL">Classical</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="result">Result</label>
+          <select id="result" formControlName="result">
+            <option value="WHITE_WINS">1-0 (White wins)</option>
+            <option value="BLACK_WINS">0-1 (Black wins)</option>
+            <option value="DRAW">½-½ (Draw)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="time">Time Control</label>
+          <input id="time" type="text" formControlName="time" placeholder="e.g. 5+3" />
+          @if (form.controls.time.invalid && form.controls.time.touched) {
+            <span class="field-error">Required.</span>
+          }
+        </div>
+        <div class="field">
+          <label for="date">Date</label>
+          <input id="date" type="date" formControlName="date" />
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2 class="section-title">Moves <span class="optional">optional</span></h2>
+      <div class="field">
+        <label for="pgn">PGN</label>
+        <textarea id="pgn" formControlName="pgn" rows="6" placeholder="1. e4 e5 2. Nf3 …"></textarea>
+      </div>
+    </div>
+
+    @if (error()) {
+      <p class="submit-error">{{ error() }}</p>
+    }
+
+    <div class="form-actions">
+      <a class="btn-secondary" routerLink="/games">Cancel</a>
+      <button class="btn-primary" type="submit" [disabled]="submitting()">
+        {{ submitting() ? 'Saving…' : 'Save Game' }}
+      </button>
+    </div>
+
+  </form>
+}

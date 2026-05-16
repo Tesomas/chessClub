@@ -14,7 +14,8 @@ data class Game(
     val whitePlayerRating: Int,
     val blackPlayerRating: Int,
     val gameType: GameType,
+    val result: GameResult,
     val time: String,
     val date: LocalDate,
-    val pgn: String
+    val pgn: String? = null
 )
