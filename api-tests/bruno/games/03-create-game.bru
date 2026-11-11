@@ -1,0 +1,54 @@
+meta {
+  name: Create game
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/games
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "whitePlayerId": "{{whiteId}}",
+    "blackPlayerId": "{{blackId}}",
+    "whitePlayerRating": 2850,
+    "blackPlayerRating": 2800,
+    "gameType": "RAPID",
+    "time": "10+0",
+    "date": "2024-11-25",
+    "pgn": "1. e4 e5 2. Nf3 Nc6 3. Bb5 *"
+  }
+}
+
+script:post-response {
+  bru.setVar("gameId", res.getBody().id);
+}
+
+tests {
+  test("returns 201", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+
+  test("returns JSON with a server-assigned id", function() {
+    expect(res.getHeader("content-type")).to.contain("application/json");
+    expect(res.getBody().id).to.be.a("string").and.not.empty;
+  });
+
+  test("denormalizes player names from the player records", function() {
+    const body = res.getBody();
+    expect(body.whitePlayerName).to.equal("Magnus Carlsen");
+    expect(body.blackPlayerName).to.equal("Hikaru Nakamura");
+  });
+
+  test("echoes the game details", function() {
+    const body = res.getBody();
+    expect(body.whitePlayerId).to.equal(bru.getVar("whiteId"));
+    expect(body.blackPlayerId).to.equal(bru.getVar("blackId"));
+    expect(body.gameType).to.equal("RAPID");
+    expect(body.time).to.equal("10+0");
+    expect(body.date).to.equal("2024-11-25");
+  });
+}

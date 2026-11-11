@@ -1,0 +1,17 @@
+meta {
+  name: Delete black player
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{baseUrl}}/api/players/{{blackId}}
+  body: none
+  auth: none
+}
+
+tests {
+  test("returns 204", function() {
+    expect(res.getStatus()).to.equal(204);
+  });
+}

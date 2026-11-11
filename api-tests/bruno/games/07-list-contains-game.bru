@@ -1,0 +1,26 @@
+meta {
+  name: List games contains created game
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/games
+  body: none
+  auth: none
+}
+
+tests {
+  test("returns 200 with a JSON array", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.be.an("array");
+  });
+
+  test("includes the created game and none of the rejected ones", function() {
+    const games = res.getBody();
+    expect(games.map((g) => g.id)).to.include(bru.getVar("gameId"));
+    const unknownId = bru.getEnvVar("unknownId");
+    const rejected = games.filter((g) => g.whitePlayerId === unknownId || g.blackPlayerId === unknownId);
+    expect(rejected).to.have.lengthOf(0);
+  });
+}

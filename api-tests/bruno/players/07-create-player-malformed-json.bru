@@ -1,0 +1,30 @@
+meta {
+  name: Create player with malformed JSON
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/players
+  body: text
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:text {
+  {"firstName": "Broken",
+}
+
+tests {
+  test("returns 400", function() {
+    expect(res.getStatus()).to.equal(400);
+  });
+
+  test("returns a ProblemDetail", function() {
+    expect(res.getHeader("content-type")).to.contain("application/problem+json");
+    expect(res.getBody().status).to.equal(400);
+  });
+}

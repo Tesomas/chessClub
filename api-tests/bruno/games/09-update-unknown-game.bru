@@ -1,0 +1,30 @@
+meta {
+  name: Update unknown game
+  type: http
+  seq: 9
+}
+
+put {
+  url: {{baseUrl}}/api/games/{{unknownId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "whitePlayerId": "{{whiteId}}",
+    "blackPlayerId": "{{blackId}}",
+    "whitePlayerRating": 2850,
+    "blackPlayerRating": 2800,
+    "gameType": "RAPID",
+    "time": "10+0",
+    "date": "2024-11-25",
+    "pgn": "1. e4 *"
+  }
+}
+
+tests {
+  test("returns 404", function() {
+    expect(res.getStatus()).to.equal(404);
+  });
+}

@@ -3,21 +3,27 @@ package org.tesomas.chessclub.controller
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.resttestclient.TestRestTemplate
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.context.annotation.Import
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
+import org.tesomas.chessclub.TestFixtures.aGame
+import org.tesomas.chessclub.TestFixtures.aPlayer
+import org.tesomas.chessclub.TestcontainersConfiguration
 import org.tesomas.chessclub.model.Game
 import org.tesomas.chessclub.model.GameType
 import org.tesomas.chessclub.model.Player
 import org.tesomas.chessclub.repository.GameRepository
 import org.tesomas.chessclub.repository.PlayerRepository
-import java.time.LocalDate
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureTestRestTemplate
+@Import(TestcontainersConfiguration::class)
 class GameControllerTest {
 
     @Autowired lateinit var restTemplate: TestRestTemplate
@@ -31,22 +37,11 @@ class GameControllerTest {
     fun setUp() {
         gameRepository.deleteAll()
         playerRepository.deleteAll()
-        white = playerRepository.save(Player(firstName = "Magnus", lastName = "Carlsen"))
-        black = playerRepository.save(Player(firstName = "Hikaru", lastName = "Nakamura"))
+        white = playerRepository.save(aPlayer(firstName = "Magnus", lastName = "Carlsen"))
+        black = playerRepository.save(aPlayer(firstName = "Hikaru", lastName = "Nakamura"))
     }
 
-    private fun testGame() = Game(
-        whitePlayerId = white.id!!,
-        blackPlayerId = black.id!!,
-        whitePlayerName = "Magnus Carlsen",
-        blackPlayerName = "Hikaru Nakamura",
-        whitePlayerRating = 2850,
-        blackPlayerRating = 2800,
-        gameType = GameType.RAPID,
-        time = "10+0",
-        date = LocalDate.of(2024, 1, 15),
-        pgn = "1. e4 e5 2. Nf3 Nc6"
-    )
+    private fun testGame() = aGame(white, black)
 
     @Test
     fun `GET games returns empty list`() {
@@ -69,6 +64,17 @@ class GameControllerTest {
         assertEquals(HttpStatus.CREATED, response.statusCode)
         assertEquals("Magnus Carlsen", response.body?.whitePlayerName)
         assertEquals("Hikaru Nakamura", response.body?.blackPlayerName)
+    }
+
+    @Test
+    fun `POST game with unknown player returns 404`() {
+        val response = restTemplate.postForEntity(
+            "/api/games",
+            testGame().copy(whitePlayerId = "nonexistent"),
+            String::class.java
+        )
+        assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
+        assertEquals(0, gameRepository.count())
     }
 
     @Test
@@ -106,6 +112,18 @@ class GameControllerTest {
             HttpMethod.PUT,
             HttpEntity(testGame()),
             Game::class.java
+        )
+        assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
+    }
+
+    @Test
+    fun `PUT game with unknown player returns 404`() {
+        val saved = gameRepository.save(testGame())
+        val response = restTemplate.exchange(
+            "/api/games/${saved.id}",
+            HttpMethod.PUT,
+            HttpEntity(saved.copy(blackPlayerId = "nonexistent")),
+            String::class.java
         )
         assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
     }

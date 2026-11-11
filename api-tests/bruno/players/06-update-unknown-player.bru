@@ -1,0 +1,24 @@
+meta {
+  name: Update unknown player
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{baseUrl}}/api/players/{{unknownId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "firstName": "Nobody",
+    "lastName": "Here"
+  }
+}
+
+tests {
+  test("returns 404", function() {
+    expect(res.getStatus()).to.equal(404);
+  });
+}

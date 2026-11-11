@@ -1,0 +1,40 @@
+meta {
+  name: Update player
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/api/players/{{playerId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "firstName": "Bruno",
+    "lastName": "Tester",
+    "rapidElo": 1900,
+    "blitzElo": 1750,
+    "bulletElo": 1600,
+    "classicalElo": 1950
+  }
+}
+
+tests {
+  test("returns 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("keeps the path id", function() {
+    expect(res.getBody().id).to.equal(bru.getVar("playerId"));
+  });
+
+  test("applies the new ratings", function() {
+    const body = res.getBody();
+    expect(body.rapidElo).to.equal(1900);
+    expect(body.blitzElo).to.equal(1750);
+    expect(body.bulletElo).to.equal(1600);
+    expect(body.classicalElo).to.equal(1950);
+  });
+}

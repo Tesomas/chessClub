@@ -1,0 +1,17 @@
+meta {
+  name: Get unknown player
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/players/{{unknownId}}
+  body: none
+  auth: none
+}
+
+tests {
+  test("returns 404", function() {
+    expect(res.getStatus()).to.equal(404);
+  });
+}

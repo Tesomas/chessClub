@@ -1,0 +1,42 @@
+meta {
+  name: Update game PGN
+  type: http
+  seq: 8
+}
+
+put {
+  url: {{baseUrl}}/api/games/{{gameId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "whitePlayerId": "{{whiteId}}",
+    "blackPlayerId": "{{blackId}}",
+    "whitePlayerRating": 2850,
+    "blackPlayerRating": 2800,
+    "gameType": "RAPID",
+    "time": "10+0",
+    "date": "2024-11-25",
+    "pgn": "1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 1-0"
+  }
+}
+
+tests {
+  test("returns 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("keeps the path id and applies the new PGN", function() {
+    const body = res.getBody();
+    expect(body.id).to.equal(bru.getVar("gameId"));
+    expect(body.pgn).to.equal("1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 1-0");
+  });
+
+  test("keeps denormalized player names", function() {
+    const body = res.getBody();
+    expect(body.whitePlayerName).to.equal("Magnus Carlsen");
+    expect(body.blackPlayerName).to.equal("Hikaru Nakamura");
+  });
+}

@@ -3,17 +3,23 @@ package org.tesomas.chessclub.controller
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.resttestclient.TestRestTemplate
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.context.annotation.Import
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
+import org.tesomas.chessclub.TestFixtures.aPlayer
+import org.tesomas.chessclub.TestcontainersConfiguration
 import org.tesomas.chessclub.model.Player
 import org.tesomas.chessclub.repository.PlayerRepository
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureTestRestTemplate
+@Import(TestcontainersConfiguration::class)
 class PlayerControllerTest {
 
     @Autowired lateinit var restTemplate: TestRestTemplate
@@ -33,7 +39,7 @@ class PlayerControllerTest {
 
     @Test
     fun `POST player creates and returns 201`() {
-        val player = Player(firstName = "Magnus", lastName = "Carlsen", rapidElo = 2800)
+        val player = aPlayer(firstName = "Magnus", lastName = "Carlsen", rapidElo = 2800)
         val response = restTemplate.postForEntity("/api/players", player, Player::class.java)
         assertEquals(HttpStatus.CREATED, response.statusCode)
         assertNotNull(response.body?.id)
@@ -42,7 +48,7 @@ class PlayerControllerTest {
 
     @Test
     fun `GET player by id returns player`() {
-        val saved = playerRepository.save(Player(firstName = "Hikaru", lastName = "Nakamura"))
+        val saved = playerRepository.save(aPlayer(firstName = "Hikaru", lastName = "Nakamura"))
         val response = restTemplate.getForEntity("/api/players/${saved.id}", Player::class.java)
         assertEquals(HttpStatus.OK, response.statusCode)
         assertEquals("Hikaru", response.body?.firstName)
@@ -56,7 +62,7 @@ class PlayerControllerTest {
 
     @Test
     fun `PUT player updates and returns player`() {
-        val saved = playerRepository.save(Player(firstName = "Ian", lastName = "Nepomniachtchi"))
+        val saved = playerRepository.save(aPlayer(firstName = "Ian", lastName = "Nepomniachtchi"))
         val updated = saved.copy(rapidElo = 2750)
         val response = restTemplate.exchange(
             "/api/players/${saved.id}",
@@ -70,7 +76,7 @@ class PlayerControllerTest {
 
     @Test
     fun `PUT player with unknown id returns 404`() {
-        val player = Player(firstName = "X", lastName = "Y")
+        val player = aPlayer(firstName = "X", lastName = "Y")
         val response = restTemplate.exchange(
             "/api/players/nonexistent",
             HttpMethod.PUT,
@@ -82,7 +88,7 @@ class PlayerControllerTest {
 
     @Test
     fun `DELETE player removes and returns 204`() {
-        val saved = playerRepository.save(Player(firstName = "Fabiano", lastName = "Caruana"))
+        val saved = playerRepository.save(aPlayer(firstName = "Fabiano", lastName = "Caruana"))
         val response = restTemplate.exchange(
             "/api/players/${saved.id}",
             HttpMethod.DELETE,

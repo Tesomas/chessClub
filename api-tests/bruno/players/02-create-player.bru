@@ -1,0 +1,54 @@
+meta {
+  name: Create player
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/players
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "id": "client-supplied-id",
+    "firstName": "Bruno",
+    "lastName": "Tester",
+    "rapidElo": 1850
+  }
+}
+
+script:post-response {
+  bru.setVar("playerId", res.getBody().id);
+}
+
+tests {
+  test("returns 201", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+
+  test("returns JSON", function() {
+    expect(res.getHeader("content-type")).to.contain("application/json");
+  });
+
+  test("server assigns an id and ignores the client-supplied one", function() {
+    const body = res.getBody();
+    expect(body.id).to.be.a("string").and.not.empty;
+    expect(body.id).to.not.equal("client-supplied-id");
+  });
+
+  test("echoes the submitted fields", function() {
+    const body = res.getBody();
+    expect(body.firstName).to.equal("Bruno");
+    expect(body.lastName).to.equal("Tester");
+    expect(body.rapidElo).to.equal(1850);
+  });
+
+  test("omitted ELO ratings default to 1200", function() {
+    const body = res.getBody();
+    expect(body.blitzElo).to.equal(1200);
+    expect(body.bulletElo).to.equal(1200);
+    expect(body.classicalElo).to.equal(1200);
+  });
+}

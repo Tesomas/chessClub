@@ -1,0 +1,37 @@
+meta {
+  name: Create game with unknown white player
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/games
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "whitePlayerId": "{{unknownId}}",
+    "blackPlayerId": "{{blackId}}",
+    "whitePlayerRating": 2000,
+    "blackPlayerRating": 2800,
+    "gameType": "BLITZ",
+    "time": "3+2",
+    "date": "2024-11-26",
+    "pgn": "1. d4 *"
+  }
+}
+
+tests {
+  test("returns 404", function() {
+    expect(res.getStatus()).to.equal(404);
+  });
+
+  test("returns a ProblemDetail naming the missing player", function() {
+    const body = res.getBody();
+    expect(res.getHeader("content-type")).to.contain("application/problem+json");
+    expect(body.status).to.equal(404);
+    expect(body.detail).to.equal("Player " + bru.getEnvVar("unknownId") + " not found");
+  });
+}

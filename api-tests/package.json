@@ -1,0 +1,17 @@
+{
+  "name": "chessclub-api-tests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bruno API test suite for the ChessClub backend",
+  "type": "module",
+  "scripts": {
+    "test:api": "node run-api-tests.mjs",
+    "bru": "cd bruno && bru run players games docs teardown --env local"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@usebruno/cli": "4.3.0"
+  }
+}

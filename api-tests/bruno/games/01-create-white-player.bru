@@ -1,0 +1,30 @@
+meta {
+  name: Create white player
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/players
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "firstName": "Magnus",
+    "lastName": "Carlsen",
+    "rapidElo": 2850
+  }
+}
+
+script:post-response {
+  bru.setVar("whiteId", res.getBody().id);
+}
+
+tests {
+  test("returns 201 with an id", function() {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().id).to.be.a("string").and.not.empty;
+  });
+}

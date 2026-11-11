@@ -1,0 +1,17 @@
+meta {
+  name: Get deleted game
+  type: http
+  seq: 12
+}
+
+get {
+  url: {{baseUrl}}/api/games/{{gameId}}
+  body: none
+  auth: none
+}
+
+tests {
+  test("returns 404", function() {
+    expect(res.getStatus()).to.equal(404);
+  });
+}

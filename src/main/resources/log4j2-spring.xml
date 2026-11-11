@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Log4j2 configuration for ChessClub (picked up by Spring Boot because of the "-spring" suffix,
+  so logging.level.* properties and the actuator loggers endpoint still override these levels).
+
+  Log directory: system property LOG_DIR, else environment variable LOG_DIR, else "logs".
+  monitorInterval: edits to this file are picked up within 30 s without a restart
+  (note: a reload resets levels previously set via the actuator loggers endpoint).
+-->
+<Configuration status="WARN" monitorInterval="30">
+    <Properties>
+        <Property name="logDir">${sys:LOG_DIR:-${env:LOG_DIR:-logs}}</Property>
+        <Property name="logPattern">%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5level [%t] %logger{36} [requestId=%X{requestId}] - %msg%n%throwable</Property>
+    </Properties>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT" follow="true">
+            <PatternLayout pattern="${logPattern}" charset="UTF-8"/>
+        </Console>
+
+        <RollingFile name="RollingFile"
+                     fileName="${logDir}/chessClub.log"
+                     filePattern="${logDir}/chessClub-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="${logPattern}" charset="UTF-8"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="14"/>
+        </RollingFile>
+
+        <Async name="AsyncFile">
+            <AppenderRef ref="RollingFile"/>
+        </Async>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="org.tesomas.chessclub" level="INFO"/>
+        <Logger name="org.springframework" level="INFO"/>
+        <Logger name="org.mongodb.driver" level="WARN"/>
+
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="AsyncFile"/>
+        </Root>
+    </Loggers>
+</Configuration>

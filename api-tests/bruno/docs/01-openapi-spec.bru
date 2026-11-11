@@ -1,0 +1,26 @@
+meta {
+  name: OpenAPI spec
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/v3/api-docs
+  body: none
+  auth: none
+}
+
+tests {
+  test("returns 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("describes the ChessClub API", function() {
+    expect(res.getBody().info.title).to.equal("ChessClub API");
+  });
+
+  test("documents the player and game endpoints", function() {
+    const paths = Object.keys(res.getBody().paths);
+    expect(paths).to.include.members(["/api/players", "/api/players/{id}", "/api/games", "/api/games/{id}"]);
+  });
+}

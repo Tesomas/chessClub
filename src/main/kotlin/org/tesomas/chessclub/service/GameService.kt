@@ -1,5 +1,6 @@
 package org.tesomas.chessclub.service
 
+import org.apache.logging.log4j.LogManager
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.tesomas.chessclub.model.Game
@@ -13,34 +14,65 @@ class GameService(
     private val playerRepository: PlayerRepository
 ) {
 
-    fun findAll(): List<Game> = gameRepository.findAll()
+    fun findAll(): List<Game> {
+        log.debug("Listing all games")
+        return gameRepository.findAll()
+    }
 
-    fun findById(id: String): Game? = gameRepository.findByIdOrNull(id)
+    fun findById(id: String): Game? {
+        log.debug("Looking up game {}", id)
+        return gameRepository.findByIdOrNull(id)
+            .also { if (it == null) log.warn("Game {} not found", id) }
+    }
 
     fun create(game: Game): Game {
         val (white, black) = resolvePlayers(game.whitePlayerId, game.blackPlayerId)
-        return gameRepository.save(game.copy(id = null, whitePlayerName = white.fullName, blackPlayerName = black.fullName))
+        val saved = gameRepository.save(
+            game.copy(id = null, whitePlayerName = white.fullName, blackPlayerName = black.fullName)
+        )
+        log.info("Created game {} (white={}, black={})", saved.id, game.whitePlayerId, game.blackPlayerId)
+        return saved
     }
 
     fun update(id: String, game: Game): Game? {
-        if (!gameRepository.existsById(id)) return null
+        if (!gameRepository.existsById(id)) {
+            log.warn("Update failed: game {} not found", id)
+            return null
+        }
         val (white, black) = resolvePlayers(game.whitePlayerId, game.blackPlayerId)
-        return gameRepository.save(game.copy(id = id, whitePlayerName = white.fullName, blackPlayerName = black.fullName))
+        val saved = gameRepository.save(
+            game.copy(id = id, whitePlayerName = white.fullName, blackPlayerName = black.fullName)
+        )
+        log.info("Updated game {}", id)
+        return saved
     }
 
     fun delete(id: String): Boolean {
-        if (!gameRepository.existsById(id)) return false
+        if (!gameRepository.existsById(id)) {
+            log.warn("Delete failed: game {} not found", id)
+            return false
+        }
         gameRepository.deleteById(id)
+        log.info("Deleted game {}", id)
         return true
     }
 
     private fun resolvePlayers(whiteId: String, blackId: String): Pair<Player, Player> {
-        val white = playerRepository.findByIdOrNull(whiteId)
-            ?: throw IllegalArgumentException("White player $whiteId not found")
-        val black = playerRepository.findByIdOrNull(blackId)
-            ?: throw IllegalArgumentException("Black player $blackId not found")
+        val white = findPlayerOrThrow(whiteId)
+        val black = findPlayerOrThrow(blackId)
         return white to black
     }
 
+    private fun findPlayerOrThrow(playerId: String): Player =
+        playerRepository.findByIdOrNull(playerId) ?: run {
+            // ApiExceptionHandler logs the WARN; keep this at DEBUG to avoid duplicate warnings
+            log.debug("Referenced player {} not found", playerId)
+            throw PlayerNotFoundException(playerId)
+        }
+
     private val Player.fullName get() = "$firstName $lastName"
+
+    private companion object {
+        private val log = LogManager.getLogger(GameService::class.java)
+    }
 }

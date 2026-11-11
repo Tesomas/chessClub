@@ -1,0 +1,6 @@
+tests {
+  // Applied to every request in the collection.
+  test("responds within 2 seconds", function() {
+    expect(res.getResponseTime()).to.be.below(2000);
+  });
+}

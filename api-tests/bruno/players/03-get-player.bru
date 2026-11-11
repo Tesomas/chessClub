@@ -1,0 +1,24 @@
+meta {
+  name: Get player by id
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/players/{{playerId}}
+  body: none
+  auth: none
+}
+
+tests {
+  test("returns 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("returns the created player", function() {
+    const body = res.getBody();
+    expect(body.id).to.equal(bru.getVar("playerId"));
+    expect(body.firstName).to.equal("Bruno");
+    expect(body.lastName).to.equal("Tester");
+  });
+}

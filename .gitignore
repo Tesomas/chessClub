@@ -43,3 +43,14 @@ out/
 frontend/node_modules/
 frontend/dist/
 frontend/.angular/cache/
+
+### Secrets / local config ###
+src/main/resources/application-local.properties
+.env
+
+### Logs ###
+logs/
+*.log
+
+### Bruno / API tests ###
+api-tests/node_modules/
