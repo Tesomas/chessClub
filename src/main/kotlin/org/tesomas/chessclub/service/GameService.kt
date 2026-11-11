@@ -4,6 +4,8 @@ import org.apache.logging.log4j.LogManager
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.tesomas.chessclub.model.Game
+import org.tesomas.chessclub.model.GameCreateRequest
+import org.tesomas.chessclub.model.GameType
 import org.tesomas.chessclub.model.Player
 import org.tesomas.chessclub.repository.GameRepository
 import org.tesomas.chessclub.repository.PlayerRepository
@@ -25,13 +27,23 @@ class GameService(
             .also { if (it == null) log.warn("Game {} not found", id) }
     }
 
-    fun create(game: Game): Game {
-        val (white, black) = resolvePlayers(game.whitePlayerId, game.blackPlayerId)
-        val saved = gameRepository.save(
-            game.copy(id = null, whitePlayerName = white.fullName, blackPlayerName = black.fullName)
+    fun create(request: GameCreateRequest): Game {
+        val (white, black) = resolvePlayers(request.whitePlayerId, request.blackPlayerId)
+        return gameRepository.save(
+            Game(
+                whitePlayerId = request.whitePlayerId,
+                blackPlayerId = request.blackPlayerId,
+                whitePlayerName = white.fullName,
+                blackPlayerName = black.fullName,
+                whitePlayerRating = white.eloForType(request.gameType),
+                blackPlayerRating = black.eloForType(request.gameType),
+                gameType = request.gameType,
+                result = request.result,
+                time = request.time,
+                date = request.date,
+                pgn = request.pgn
+            )
         )
-        log.info("Created game {} (white={}, black={})", saved.id, game.whitePlayerId, game.blackPlayerId)
-        return saved
     }
 
     fun update(id: String, game: Game): Game? {
@@ -74,5 +86,12 @@ class GameService(
 
     private companion object {
         private val log = LogManager.getLogger(GameService::class.java)
+    }
+
+    private fun Player.eloForType(gameType: GameType): Int = when (gameType) {
+        GameType.RAPID -> rapidElo
+        GameType.BLITZ -> blitzElo
+        GameType.BULLET -> bulletElo
+        GameType.CLASSICAL -> classicalElo
     }
 }

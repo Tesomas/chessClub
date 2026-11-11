@@ -6,11 +6,13 @@ export interface Player {
   id: string;
   firstName: string;
   lastName: string;
-  eloRapid: number;
-  eloBlitz: number;
-  eloBullet: number;
-  eloClassical: number;
+  rapidElo: number;
+  blitzElo: number;
+  bulletElo: number;
+  classicalElo: number;
 }
+
+export type PlayerCreateDto = Omit<Player, 'id'>;
 
 @Injectable({ providedIn: 'root' })
 export class PlayerService {
@@ -18,5 +20,9 @@ export class PlayerService {
 
   getAll(): Observable<Player[]> {
     return this.http.get<Player[]>('/api/players');
+  }
+
+  create(dto: PlayerCreateDto): Observable<Player> {
+    return this.http.post<Player>('/api/players', dto);
   }
 }
