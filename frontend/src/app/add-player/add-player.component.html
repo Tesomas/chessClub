@@ -1,0 +1,53 @@
+<header class="page-header">
+  <h1>Add Player</h1>
+</header>
+
+<form class="player-form" [formGroup]="form" (ngSubmit)="submit()">
+  <div class="form-section">
+    <h2 class="section-title">Personal Info</h2>
+    <div class="form-row">
+      <div class="field">
+        <label for="firstName">First Name</label>
+        <input id="firstName" type="text" formControlName="firstName" autocomplete="given-name" />
+        @if (form.controls.firstName.invalid && form.controls.firstName.touched) {
+          <span class="field-error">First name is required.</span>
+        }
+      </div>
+      <div class="field">
+        <label for="lastName">Last Name</label>
+        <input id="lastName" type="text" formControlName="lastName" autocomplete="family-name" />
+        @if (form.controls.lastName.invalid && form.controls.lastName.touched) {
+          <span class="field-error">Last name is required.</span>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h2 class="section-title">ELO Ratings</h2>
+    <div class="form-row elo-row">
+      @for (ctrl of [
+        { name: 'rapidElo', label: 'Rapid' },
+        { name: 'blitzElo', label: 'Blitz' },
+        { name: 'bulletElo', label: 'Bullet' },
+        { name: 'classicalElo', label: 'Classical' }
+      ]; track ctrl.name) {
+        <div class="field">
+          <label [for]="ctrl.name">{{ ctrl.label }}</label>
+          <input [id]="ctrl.name" type="number" [formControlName]="ctrl.name" min="100" max="3000" />
+        </div>
+      }
+    </div>
+  </div>
+
+  @if (error()) {
+    <p class="submit-error">{{ error() }}</p>
+  }
+
+  <div class="form-actions">
+    <a class="btn-secondary" routerLink="/players">Cancel</a>
+    <button class="btn-primary" type="submit" [disabled]="submitting()">
+      {{ submitting() ? 'Saving…' : 'Add Player' }}
+    </button>
+  </div>
+</form>

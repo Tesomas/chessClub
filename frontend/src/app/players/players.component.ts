@@ -1,10 +1,13 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { PlayerService, Player } from '../player.service';
 
 @Component({
   selector: 'app-players',
+  standalone: true,
+  imports: [RouterLink],
   templateUrl: './players.component.html',
-  styleUrl: './players.component.scss'
+  styleUrl: './players.component.scss',
 })
 export class PlayersComponent implements OnInit {
   private readonly playerService = inject(PlayerService);
@@ -22,7 +25,7 @@ export class PlayersComponent implements OnInit {
       error: () => {
         this.error.set('Could not load players. Is the backend running?');
         this.loading.set(false);
-      }
+      },
     });
   }
 }

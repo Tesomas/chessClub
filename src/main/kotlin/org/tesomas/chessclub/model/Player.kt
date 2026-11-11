@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
-@Document(collection = "players")
+@Document(collection = "Players")
 @Schema(description = "Chess club member with ELO ratings across time controls")
 data class Player(
     @Id

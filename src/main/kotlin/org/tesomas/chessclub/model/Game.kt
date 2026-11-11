@@ -33,12 +33,16 @@ data class Game(
     @Schema(description = "Time control category of the game")
     val gameType: GameType,
 
+    @Schema(description="Result of the game")
+    val result: GameResult,
+
     @Schema(description = "Time control string (e.g. '10+0', '3+2', '1+0', '90+30')", example = "10+0")
     val time: String,
 
     @Schema(description = "Date the game was played", example = "2024-11-25")
     val date: LocalDate,
-
+      
     @Schema(description = "Portable Game Notation (PGN) of the full game", example = "1. e4 e5 2. Nf3 Nc6 3. Bb5 *")
-    val pgn: String
+    val pgn: String? = null
+
 )

@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.tesomas.chessclub.model.Game
+import org.tesomas.chessclub.model.GameCreateRequest
 import org.tesomas.chessclub.service.GameService
 
 @RestController
@@ -53,12 +54,12 @@ class GameController(private val gameService: GameService) {
     @ApiResponses(value = [
         ApiResponse(
             responseCode = "201", description = "Game recorded",
-            content = [Content(schema = Schema(implementation = Game::class))]
+            content = [Content(schema = Schema(implementation = GameCreateRequest::class))]
         ),
         ApiResponse(responseCode = "400", description = "Invalid request body", content = [Content()]),
         ApiResponse(responseCode = "404", description = "One or both referenced players do not exist", content = [Content()])
     ])
-    fun create(@RequestBody game: Game): Game = gameService.create(game)
+    fun create(@RequestBody request: GameCreateRequest): Game = gameService.create(request)
 
     @PutMapping("/{id}")
     @Operation(
