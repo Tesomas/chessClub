@@ -58,7 +58,6 @@ these in mind as features are built:
   game only if you are one of the players") can be added later without rewriting the business logic.
 - **Track who did what.** Games and tournament results should record who entered them, and results
   entered by a member may eventually need the opponent's or admin's confirmation.
-- **Plan for more than one club.** Do not assume a single global roster where it is cheap to avoid.
 - **Keep the API stateless and token-friendly**, so adding authentication (for example, JWT or
   OAuth2 through Spring Security) is a matter of configuration plus access rules.
 
@@ -72,6 +71,7 @@ these in mind as features are built:
 
 ## Out of scope
 
+- Multiple clubs. The app serves a single club.
 - Playing chess online or analyzing positions; the app records and organizes games played elsewhere.
 - Official federation (FIDE/USCF) rating submission. Ratings are internal to the club.
 
