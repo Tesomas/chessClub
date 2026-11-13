@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-ChessClub is a Spring Boot 4 + Kotlin + MongoDB backend service. The codebase is in early stages — only the application entry point and a context-loads test exist so far.
+ChessClub is a Spring Boot 4 + Kotlin + MongoDB backend service, a tool for people organizing local chess clubs: track player ELO, record game history, and run Swiss, round robin, and elimination tournaments. It starts with a single admin user, but the design must allow members to log in later to record games and enter tournaments. See `docs/GOALS.md` for the full goals and the multi-user design principles.
 
 ## Tech Stack
 
