@@ -31,6 +31,15 @@ class GameControllerWebTest {
         {"whitePlayerId":"w1","blackPlayerId":"b1","gameType":"BLITZ","result":"DRAW","time":"3+2","date":"2024-11-25","pgn":"1. e4 e5 *"}
     """.trimIndent()
 
+    /** PUT replaces a whole Game document, so its body needs the rating snapshots too. */
+    private val putJson = """
+        {"whitePlayerId":"w1","blackPlayerId":"b1","whitePlayerRating":2850,"blackPlayerRating":2800,
+         "gameType":"BLITZ","result":"DRAW","time":"3+2","date":"2024-11-25","pgn":"1. e4 e5 *"}
+    """.trimIndent()
+
+    private fun named(game: Game, id: String) =
+        game.copy(id = id, whitePlayerName = "Magnus Carlsen", blackPlayerName = "Hikaru Nakamura")
+
     private fun created(request: GameCreateRequest, id: String) = Game(
         id = id,
         whitePlayerId = request.whitePlayerId,
@@ -155,7 +164,7 @@ class GameControllerWebTest {
         // Act + Assert
         mockMvc.put("/api/games/g1") {
             contentType = MediaType.APPLICATION_JSON
-            content = gameJson
+            content = putJson
         }.andExpect {
             status { isOk() }
             jsonPath("$.id") { value("g1") }
@@ -171,7 +180,7 @@ class GameControllerWebTest {
         // Act + Assert
         mockMvc.put("/api/games/missing") {
             contentType = MediaType.APPLICATION_JSON
-            content = gameJson
+            content = putJson
         }.andExpect { status { isNotFound() } }
     }
 
@@ -183,7 +192,7 @@ class GameControllerWebTest {
         // Act + Assert
         mockMvc.put("/api/games/g1") {
             contentType = MediaType.APPLICATION_JSON
-            content = gameJson
+            content = putJson
         }.andExpect {
             status { isNotFound() }
             jsonPath("$.detail") { value("Player b1 not found") }
