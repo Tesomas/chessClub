@@ -1,5 +1,3 @@
-import org.gradle.internal.impldep.org.jsoup.nodes.Document
-
 plugins {
     kotlin("jvm") version "2.2.21"
     kotlin("plugin.spring") version "2.2.21"
@@ -74,8 +72,8 @@ tasks.test {
 tasks.jacocoTestReport {
     dependsOn(tasks.test)
     reports {
-        Document.OutputSettings.Syntax.xml.required = true
-        Document.OutputSettings.Syntax.html.required = true
+        xml.required = true
+        html.required = true
     }
 }
 
