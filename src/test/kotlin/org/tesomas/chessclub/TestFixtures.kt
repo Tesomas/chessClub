@@ -1,6 +1,8 @@
 package org.tesomas.chessclub
 
 import org.tesomas.chessclub.model.Game
+import org.tesomas.chessclub.model.GameCreateRequest
+import org.tesomas.chessclub.model.GameResult
 import org.tesomas.chessclub.model.GameType
 import org.tesomas.chessclub.model.Player
 import java.time.LocalDate
@@ -33,6 +35,7 @@ object TestFixtures {
         whitePlayerName: String = "",
         blackPlayerName: String = "",
         gameType: GameType = GameType.RAPID,
+        result: GameResult = GameResult.WHITE_WINS,
         time: String = "10+0",
         date: LocalDate = LocalDate.of(2024, 1, 15),
         pgn: String = "1. e4 e5 2. Nf3 Nc6"
@@ -45,6 +48,7 @@ object TestFixtures {
         whitePlayerRating = 2850,
         blackPlayerRating = 2800,
         gameType = gameType,
+        result = result,
         time = time,
         date = date,
         pgn = pgn
@@ -54,5 +58,24 @@ object TestFixtures {
     fun aGame(white: Player, black: Player): Game = aGame(
         whitePlayerId = requireNotNull(white.id) { "white player must be persisted" },
         blackPlayerId = requireNotNull(black.id) { "black player must be persisted" }
+    )
+
+    /** Request body for creating a game; the service fills in names and rating snapshots. */
+    fun aGameRequest(
+        whitePlayerId: String,
+        blackPlayerId: String,
+        gameType: GameType = GameType.RAPID,
+        result: GameResult = GameResult.WHITE_WINS,
+        time: String = "10+0",
+        date: LocalDate = LocalDate.of(2024, 1, 15),
+        pgn: String? = "1. e4 e5 2. Nf3 Nc6"
+    ): GameCreateRequest = GameCreateRequest(
+        whitePlayerId = whitePlayerId,
+        blackPlayerId = blackPlayerId,
+        gameType = gameType,
+        result = result,
+        time = time,
+        date = date,
+        pgn = pgn
     )
 }

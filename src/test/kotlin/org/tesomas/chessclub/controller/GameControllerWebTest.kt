@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
 import org.tesomas.chessclub.TestFixtures.aGame
 import org.tesomas.chessclub.model.Game
+import org.tesomas.chessclub.model.GameCreateRequest
 import org.tesomas.chessclub.service.GameService
 import org.tesomas.chessclub.service.PlayerNotFoundException
 
@@ -27,12 +28,23 @@ class GameControllerWebTest {
     @MockkBean lateinit var gameService: GameService
 
     private val gameJson = """
-        {"whitePlayerId":"w1","blackPlayerId":"b1","whitePlayerRating":2850,"blackPlayerRating":2800,
-         "gameType":"BLITZ","time":"3+2","date":"2024-11-25","pgn":"1. e4 e5 *"}
+        {"whitePlayerId":"w1","blackPlayerId":"b1","gameType":"BLITZ","result":"DRAW","time":"3+2","date":"2024-11-25","pgn":"1. e4 e5 *"}
     """.trimIndent()
 
-    private fun named(game: Game, id: String) =
-        game.copy(id = id, whitePlayerName = "Magnus Carlsen", blackPlayerName = "Hikaru Nakamura")
+    private fun created(request: GameCreateRequest, id: String) = Game(
+        id = id,
+        whitePlayerId = request.whitePlayerId,
+        blackPlayerId = request.blackPlayerId,
+        whitePlayerName = "Magnus Carlsen",
+        blackPlayerName = "Hikaru Nakamura",
+        whitePlayerRating = 2850,
+        blackPlayerRating = 2800,
+        gameType = request.gameType,
+        result = request.result,
+        time = request.time,
+        date = request.date,
+        pgn = request.pgn
+    )
 
     @Test
     fun `GET games returns 200 with a JSON array`() {
@@ -78,7 +90,7 @@ class GameControllerWebTest {
     @Test
     fun `POST game returns 201 with denormalized player names`() {
         // Arrange
-        every { gameService.create(any()) } answers { named(firstArg(), "new-id") }
+        every { gameService.create(any()) } answers { created(firstArg(), "new-id") }
 
         // Act + Assert
         mockMvc.post("/api/games") {
