@@ -71,7 +71,7 @@ class GameController(private val gameService: GameService) {
     @ApiResponses(value = [
         ApiResponse(
             responseCode = "200", description = "Game updated",
-            content = [@Content(schema = Schema(implementation = Game::class))]
+            content = [Content(schema = Schema(implementation = Game::class))]
         ),
         ApiResponse(responseCode = "404", description = "Game or referenced player not found", content = [Content()])
     ])

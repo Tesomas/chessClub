@@ -11,6 +11,7 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.tesomas.chessclub.TestFixtures.aGame
+import org.tesomas.chessclub.TestFixtures.aGameRequest
 import org.tesomas.chessclub.TestFixtures.aPlayer
 import org.tesomas.chessclub.TestcontainersConfiguration
 import org.tesomas.chessclub.model.Game
@@ -43,6 +44,11 @@ class GameControllerTest {
 
     private fun testGame() = aGame(white, black)
 
+    private fun testRequest() = aGameRequest(
+        requireNotNull(white.id) { "white player must be persisted" },
+        requireNotNull(black.id) { "black player must be persisted" }
+    )
+
     @Test
     fun `GET games returns empty list`() {
         val response = restTemplate.getForEntity("/api/games", Array<Game>::class.java)
@@ -52,7 +58,7 @@ class GameControllerTest {
 
     @Test
     fun `POST game creates and returns 201`() {
-        val response = restTemplate.postForEntity("/api/games", testGame(), Game::class.java)
+        val response = restTemplate.postForEntity("/api/games", testRequest(), Game::class.java)
         assertEquals(HttpStatus.CREATED, response.statusCode)
         assertNotNull(response.body?.id)
         assertEquals(GameType.RAPID, response.body?.gameType)
@@ -60,7 +66,7 @@ class GameControllerTest {
 
     @Test
     fun `POST game snapshots player names from player records`() {
-        val response = restTemplate.postForEntity("/api/games", testGame(), Game::class.java)
+        val response = restTemplate.postForEntity("/api/games", testRequest(), Game::class.java)
         assertEquals(HttpStatus.CREATED, response.statusCode)
         assertEquals("Magnus Carlsen", response.body?.whitePlayerName)
         assertEquals("Hikaru Nakamura", response.body?.blackPlayerName)
@@ -70,7 +76,7 @@ class GameControllerTest {
     fun `POST game with unknown player returns 404`() {
         val response = restTemplate.postForEntity(
             "/api/games",
-            testGame().copy(whitePlayerId = "nonexistent"),
+            testRequest().copy(whitePlayerId = "nonexistent"),
             String::class.java
         )
         assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
