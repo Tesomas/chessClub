@@ -42,9 +42,8 @@ jobs:
         working-directory: api-tests
 
       # testAll = ./gradlew test (unit/component/integration + JaCoCo) then ./gradlew apiTest (Bruno).
-      # `bash ./gradlew` because the wrapper is not marked executable in git.
       - name: Run all tests
-        run: bash ./gradlew testAll --console=plain
+        run: ./gradlew testAll --console=plain
 
       # always(): upload reports even when tests fail, which is when you want them most.
       - name: Upload test reports
