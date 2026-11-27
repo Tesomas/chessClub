@@ -45,7 +45,14 @@
       <tbody>
         @for (game of data.content; track game.gameId) {
           <tr>
-            <td class="muted nowrap">{{ game.date }}</td>
+            <td class="nowrap">
+              <a
+                class="game-link"
+                [routerLink]="['/games', game.gameId]"
+                [attr.aria-label]="'View game on ' + game.date + ' against ' + game.opponentName"
+                >{{ game.date }}</a
+              >
+            </td>
             <td class="muted">{{ game.gameType | titlecase }}</td>
             <td>
               <span class="side">
@@ -65,12 +72,7 @@
             <td class="num muted">{{ game.opponentRating }}</td>
             <td class="num">{{ game.playerRating }}</td>
             <td class="center">
-              <span
-                class="badge {{ badge[game.outcome].css }}"
-                [attr.title]="badge[game.outcome].label"
-              >
-                {{ badge[game.outcome].letter }}
-              </span>
+              <app-outcome-badge [outcome]="game.outcome" />
             </td>
             <td class="muted col-time">{{ game.time }}</td>
           </tr>

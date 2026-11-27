@@ -16,12 +16,10 @@
   @default {
     @if (player(); as p) {
       <header class="profile">
-        <div class="avatar" role="img" aria-label="Profile picture placeholder">
-          {{ initials() }}
-        </div>
+        <app-player-avatar class="profile-avatar" [name]="fullName()" />
         <div class="identity">
           <a class="crumb" routerLink="/players">Players</a>
-          <h1>{{ p.firstName }} {{ p.lastName }}</h1>
+          <h1>{{ fullName() }}</h1>
           @if (age() !== null) {
             <p class="age">Age {{ age() }}</p>
           }

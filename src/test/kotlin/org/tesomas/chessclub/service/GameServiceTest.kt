@@ -186,4 +186,143 @@ class GameServiceTest {
         assertFalse(result)
         verify(exactly = 0) { gameRepository.deleteById(any()) }
     }
+
+    // --- PGN size limit ----------------------------------------------------------------------
+
+    @Test
+    fun `create accepts a pgn of exactly 65536 characters`() {
+        // Arrange
+        val saved = slot<Game>()
+        every { gameRepository.save(capture(saved)) } answers { saved.captured.copy(id = "generated") }
+
+        // Act
+        service.create(aGameRequest("w1", "b1", pgn = "x".repeat(GameService.MAX_PGN_LENGTH)))
+
+        // Assert
+        assertEquals(65_536, saved.captured.pgn?.length)
+    }
+
+    @Test
+    fun `create rejects a pgn of 65537 characters before touching any repository`() {
+        // Act
+        val ex = assertThrows<InvalidGameException> {
+            service.create(aGameRequest("w1", "b1", pgn = "x".repeat(65_537)))
+        }
+
+        // Assert
+        assertEquals("pgn must be at most 65536 characters", ex.message)
+        verify(exactly = 0) { playerRepository.findById(any()) }
+        verify(exactly = 0) { gameRepository.save(any<Game>()) }
+    }
+
+    @Test
+    fun `create still allows a null pgn`() {
+        // Arrange
+        val saved = slot<Game>()
+        every { gameRepository.save(capture(saved)) } answers { saved.captured }
+
+        // Act
+        service.create(aGameRequest("w1", "b1", pgn = null))
+
+        // Assert
+        assertNull(saved.captured.pgn)
+    }
+
+    @Test
+    fun `update accepts a pgn of exactly 65536 characters`() {
+        // Arrange
+        val pgn = "x".repeat(65_536)
+        every { gameRepository.existsById("g1") } returns true
+        every { gameRepository.save(any<Game>()) } answers { firstArg() }
+
+        // Act
+        val result = service.update("g1", aGame("w1", "b1", pgn = pgn))
+
+        // Assert
+        assertEquals(pgn, result?.pgn)
+    }
+
+    @Test
+    fun `update rejects a pgn of 65537 characters before checking the game exists`() {
+        // Act
+        val ex = assertThrows<InvalidGameException> {
+            service.update("g1", aGame("w1", "b1", pgn = "x".repeat(65_537)))
+        }
+
+        // Assert
+        assertEquals("pgn must be at most 65536 characters", ex.message)
+        verify(exactly = 0) { gameRepository.existsById(any()) }
+        verify(exactly = 0) { gameRepository.save(any<Game>()) }
+    }
+
+    @Test
+    fun `update still allows a null pgn`() {
+        // Arrange
+        every { gameRepository.existsById("g1") } returns true
+        every { gameRepository.save(any<Game>()) } answers { firstArg() }
+
+        // Act
+        val result = service.update("g1", aGame("w1", "b1").copy(pgn = null))
+
+        // Assert
+        assertNull(result?.pgn)
+    }
+    // The limit counts UTF-16 code units (String.length), not bytes or code points.
+
+    @Test
+    fun `a pgn of 65536 multibyte BMP characters is accepted although it is far more than 65536 bytes`() {
+        // Arrange: each of these is one UTF-16 code unit but 2 or 3 bytes in UTF-8
+        every { gameRepository.save(any<Game>()) } answers { firstArg() }
+        listOf("\u00e9", "\u4e2d").forEach { char ->
+            val pgn = char.repeat(65_536)
+
+            // Act
+            val result = service.create(aGameRequest("w1", "b1", pgn = pgn))
+
+            // Assert
+            assertEquals(65_536, result.pgn?.length)
+            assertTrue(pgn.toByteArray(Charsets.UTF_8).size > 65_536)
+        }
+    }
+
+    @Test
+    fun `32768 emoji are 65536 UTF-16 code units and are accepted`() {
+        // Arrange: U+1F600 is a surrogate pair, i.e. two code units
+        val emoji = "\uD83D\uDE00"
+        val pgn = emoji.repeat(32_768)
+        every { gameRepository.save(any<Game>()) } answers { firstArg() }
+
+        // Act
+        val result = service.create(aGameRequest("w1", "b1", pgn = pgn))
+
+        // Assert
+        assertEquals(65_536, pgn.length)
+        assertEquals(32_768, pgn.codePointCount(0, pgn.length))
+        assertEquals(pgn, result.pgn)
+    }
+
+    @Test
+    fun `32769 emoji are 65538 UTF-16 code units and are rejected`() {
+        // Arrange
+        val pgn = "\uD83D\uDE00".repeat(32_769)
+
+        // Act
+        val ex = assertThrows<InvalidGameException> { service.create(aGameRequest("w1", "b1", pgn = pgn)) }
+
+        // Assert
+        assertEquals(65_538, pgn.length)
+        assertEquals("pgn must be at most 65536 characters", ex.message)
+        verify(exactly = 0) { gameRepository.save(any<Game>()) }
+    }
+
+    @Test
+    fun `update counts UTF-16 code units the same way`() {
+        // Arrange
+        every { gameRepository.existsById("g1") } returns true
+        every { gameRepository.save(any<Game>()) } answers { firstArg() }
+
+        // Act + Assert
+        assertEquals(65_536, service.update("g1", aGame("w1", "b1", pgn = "\uD83D\uDE00".repeat(32_768)))?.pgn?.length)
+        assertThrows<InvalidGameException> { service.update("g1", aGame("w1", "b1", pgn = "\uD83D\uDE00".repeat(32_769))) }
+    }
 }

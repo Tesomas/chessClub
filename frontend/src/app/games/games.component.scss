@@ -116,3 +116,13 @@ a.player-name {
     text-decoration: none;
   }
 }
+
+.game-link {
+  color: inherit;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+}

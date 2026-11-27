@@ -28,4 +28,9 @@ export const routes: Routes = [
     path: 'games/add',
     loadComponent: () => import('./add-game/add-game.component').then((m) => m.AddGameComponent),
   },
+  {
+    // After 'games/add' so that path isn't captured as an id.
+    path: 'games/:id',
+    loadComponent: () => import('./game-view/game-view.component').then((m) => m.GameViewComponent),
+  },
 ];

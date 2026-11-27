@@ -1,0 +1,63 @@
+@switch (status()) {
+  @case ('loading') {
+    <p class="state-msg">Loading game…</p>
+  }
+  @case ('notFound') {
+    <section class="not-found">
+      <div class="not-found-icon" aria-hidden="true">♜</div>
+      <h1>Game not found</h1>
+      <p>This game doesn't exist or was removed.</p>
+      <a routerLink="/games">← Back to games</a>
+    </section>
+  }
+  @case ('error') {
+    <p class="state-msg state-error">Could not load this game. Is the backend running?</p>
+  }
+  @default {
+    @if (game(); as g) {
+      <header class="game-header">
+        <a class="crumb" routerLink="/games">Games</a>
+        <h1>{{ g.whitePlayerName }} <span class="vs">vs</span> {{ g.blackPlayerName }}</h1>
+        <dl class="meta">
+          <div>
+            <dt>Mode</dt>
+            <dd>{{ g.gameType | titlecase }}</dd>
+          </div>
+          <div>
+            <dt>Time control</dt>
+            <dd>{{ g.time }}</dd>
+          </div>
+          <div>
+            <dt>Date</dt>
+            <dd>{{ g.date }}</dd>
+          </div>
+          <div>
+            <dt>Result</dt>
+            <dd class="result">{{ resultLabel[g.result] }}</dd>
+          </div>
+        </dl>
+      </header>
+
+      <section class="players" aria-label="Players">
+        @for (card of cards(); track card.color) {
+          <article class="player-card" [class.card-black]="card.color === 'BLACK'">
+            <app-player-avatar [name]="card.name" [size]="avatarSize" [decorative]="true" />
+            <div class="card-body">
+              <p class="side">
+                <span class="swatch" aria-hidden="true"></span>
+                <span class="color-label">{{ card.colorLabel }}</span>
+              </p>
+              <a class="player-link" [routerLink]="['/players', card.playerId]">{{ card.name }}</a>
+              <p class="rating">
+                <span class="rating-value">{{ card.rating }}</span> at game time
+              </p>
+            </div>
+            <app-outcome-badge class="card-badge" [outcome]="card.outcome" />
+          </article>
+        }
+      </section>
+
+      <app-pgn-panel [pgn]="g.pgn" />
+    }
+  }
+}

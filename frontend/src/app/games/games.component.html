@@ -24,7 +24,21 @@
     <tbody>
       @for (game of games(); track game.id) {
         <tr>
-          <td class="date-cell">{{ game.date }}</td>
+          <td class="date-cell">
+            <a
+              class="game-link"
+              [routerLink]="['/games', game.id]"
+              [attr.aria-label]="
+                'View game on ' +
+                game.date +
+                ': ' +
+                game.whitePlayerName +
+                ' vs ' +
+                game.blackPlayerName
+              "
+              >{{ game.date }}</a
+            >
+          </td>
           <td class="player-cell">
             <a class="player-name" [routerLink]="['/players', game.whitePlayerId]">{{
               game.whitePlayerName

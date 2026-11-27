@@ -1,0 +1,17 @@
+meta {
+  name: Delete game with a multi-line PGN
+  type: http
+  seq: 18
+}
+
+delete {
+  url: {{baseUrl}}/api/games/{{pgnGameId}}
+  body: none
+  auth: none
+}
+
+tests {
+  test("returns 204", function() {
+    expect(res.getStatus()).to.equal(204);
+  });
+}

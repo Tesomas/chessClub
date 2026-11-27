@@ -1,0 +1,27 @@
+:host {
+  --avatar-size: 96px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.avatar {
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: calc(var(--avatar-size) / 3);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--color-accent);
+  background: radial-gradient(
+    circle at 30% 25%,
+    var(--color-surface-raised),
+    var(--color-surface) 70%
+  );
+  box-shadow:
+    0 0 0 2px var(--color-bg),
+    0 0 0 4px var(--color-accent-dim),
+    0 12px 30px rgb(0 0 0 / 40%);
+  user-select: none;
+}

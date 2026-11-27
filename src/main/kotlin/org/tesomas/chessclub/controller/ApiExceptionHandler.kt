@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 import org.tesomas.chessclub.model.InvalidPlayerGameFilterException
+import org.tesomas.chessclub.service.InvalidGameException
 import org.tesomas.chessclub.service.PlayerNotFoundException
 
 /**
@@ -29,6 +30,12 @@ class ApiExceptionHandler : ResponseEntityExceptionHandler() {
     fun handleInvalidPlayerGameFilter(ex: InvalidPlayerGameFilterException): ProblemDetail {
         log.warn("Request rejected: {}", ex.message)
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.message ?: "Invalid query parameters")
+    }
+
+    @ExceptionHandler(InvalidGameException::class)
+    fun handleInvalidGame(ex: InvalidGameException): ProblemDetail {
+        log.warn("Request rejected: {}", ex.message)
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.message ?: "Invalid game")
     }
 
     @ExceptionHandler(Exception::class)
