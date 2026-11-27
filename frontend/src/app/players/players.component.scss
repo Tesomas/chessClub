@@ -76,3 +76,12 @@
     font-weight: 600;
   }
 }
+
+.player-name a {
+  color: var(--color-text);
+
+  &:hover {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+}

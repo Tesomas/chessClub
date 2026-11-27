@@ -1,0 +1,21 @@
+meta {
+  name: Opponent name with a parenthesis is literal
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{baseUrl}}/api/players/{{pgAliceId}}/games?opponentName=C.%20(
+  body: none
+  auth: none
+}
+
+tests {
+  test("matches the literal text 'C. (' in Carla's name on both colours", function() {
+    expect(res.getStatus()).to.equal(200);
+    const content = res.getBody().content;
+    expect(content.length).to.equal(2);
+    content.forEach((g) => expect(g.opponentId).to.equal(bru.getVar("pgCarlaId")));
+    expect(content.map((g) => g.color).sort()).to.eql(["BLACK", "WHITE"]);
+  });
+}

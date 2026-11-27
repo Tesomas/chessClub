@@ -1,0 +1,17 @@
+meta {
+  name: Delete game 5
+  type: http
+  seq: 31
+}
+
+delete {
+  url: {{baseUrl}}/api/games/{{pgGame5Id}}
+  body: none
+  auth: none
+}
+
+tests {
+  test("returns 204", function() {
+    expect(res.getStatus()).to.equal(204);
+  });
+}

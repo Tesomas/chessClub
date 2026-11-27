@@ -1,0 +1,20 @@
+meta {
+  name: Sort by opponent name ascending
+  type: http
+  seq: 16
+}
+
+get {
+  url: {{baseUrl}}/api/players/{{pgAliceId}}/games?sort=opponentName&direction=asc
+  body: none
+  auth: none
+}
+
+tests {
+  test("orders by the opponent's name whichever colour they had", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().content.map((g) => g.opponentName)).to.eql(
+      ["Bob Brooks", "Bob Brooks", "Carla C. (Castillo)", "Carla C. (Castillo)"]
+    );
+  });
+}

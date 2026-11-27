@@ -1,0 +1,65 @@
+@switch (status()) {
+  @case ('loading') {
+    <p class="state-msg">Loading player…</p>
+  }
+  @case ('notFound') {
+    <section class="not-found">
+      <div class="not-found-icon" aria-hidden="true">♚</div>
+      <h1>Player not found</h1>
+      <p>This player doesn't exist or was removed from the club.</p>
+      <a routerLink="/players">← Back to players</a>
+    </section>
+  }
+  @case ('error') {
+    <p class="state-msg state-error">Could not load this player. Is the backend running?</p>
+  }
+  @default {
+    @if (player(); as p) {
+      <header class="profile">
+        <div class="avatar" role="img" aria-label="Profile picture placeholder">
+          {{ initials() }}
+        </div>
+        <div class="identity">
+          <a class="crumb" routerLink="/players">Players</a>
+          <h1>{{ p.firstName }} {{ p.lastName }}</h1>
+          @if (age() !== null) {
+            <p class="age">Age {{ age() }}</p>
+          }
+        </div>
+        <dl class="elo-grid">
+          @for (rating of ratings(); track rating.label) {
+            <div class="elo-tile">
+              <dt>{{ rating.label }}</dt>
+              <dd>{{ rating.value }}</dd>
+            </div>
+          }
+        </dl>
+      </header>
+
+      <section class="games-section" aria-labelledby="games-heading">
+        <h2 id="games-heading">Games</h2>
+        <app-game-filter [filter]="query().filter" (filterChange)="onFilterChange($event)" />
+
+        <div
+          class="games-body"
+          [class.is-loading]="gamesLoading()"
+          [attr.aria-busy]="gamesLoading()"
+        >
+          @if (gamesError(); as message) {
+            <p class="state-msg state-error games-error" role="alert">{{ message }}</p>
+          } @else if (visiblePage(); as page) {
+            <app-player-games-table
+              [page]="page"
+              [sort]="query().sort"
+              [direction]="query().direction"
+              (sortChange)="onSortChange($event)"
+              (pageChange)="onPageChange($event)"
+            />
+          } @else {
+            <p class="state-msg">Loading games…</p>
+          }
+        </div>
+      </section>
+    }
+  }
+}

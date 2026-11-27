@@ -1,0 +1,35 @@
+meta {
+  name: Create player Carla C. (Castillo)
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/players
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "firstName": "Carla",
+    "lastName": "C. (Castillo)",
+    "blitzElo": 1600,
+    "rapidElo": 1620
+  }
+}
+
+script:post-response {
+  bru.setVar("pgCarlaId", res.getBody().id);
+}
+
+tests {
+  test("returns 201 with an id", function() {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().id).to.be.a("string").and.not.empty;
+  });
+
+  test("birthDate is echoed (null when omitted)", function() {
+    expect(res.getBody().birthDate).to.equal(null);
+  });
+}

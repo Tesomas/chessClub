@@ -1,0 +1,24 @@
+meta {
+  name: Sort by opponent name descending
+  type: http
+  seq: 17
+}
+
+get {
+  url: {{baseUrl}}/api/players/{{pgAliceId}}/games?sort=opponentName&direction=desc
+  body: none
+  auth: none
+}
+
+tests {
+  test("reverses the name order, ties broken by id", function() {
+    expect(res.getStatus()).to.equal(200);
+    const content = res.getBody().content;
+    expect(content.map((g) => g.opponentName)).to.eql(
+      ["Carla C. (Castillo)", "Carla C. (Castillo)", "Bob Brooks", "Bob Brooks"]
+    );
+    expect(content.map((g) => g.gameId)).to.eql(
+      [bru.getVar("pgGame4Id"), bru.getVar("pgGame3Id"), bru.getVar("pgGame2Id"), bru.getVar("pgGame1Id")]
+    );
+  });
+}

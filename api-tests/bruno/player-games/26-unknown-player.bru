@@ -1,0 +1,19 @@
+meta {
+  name: Games of an unknown player
+  type: http
+  seq: 26
+}
+
+get {
+  url: {{baseUrl}}/api/players/{{unknownId}}/games
+  body: none
+  auth: none
+}
+
+tests {
+  test("returns 404 ProblemDetail", function() {
+    expect(res.getStatus()).to.equal(404);
+    expect(res.getHeader("content-type")).to.contain("application/problem+json");
+    expect(res.getBody().detail).to.equal("Player " + bru.getEnvVar("unknownId") + " not found");
+  });
+}

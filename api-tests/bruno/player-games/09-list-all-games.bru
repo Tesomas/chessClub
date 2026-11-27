@@ -1,0 +1,42 @@
+meta {
+  name: List all of Alice's games
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/api/players/{{pgAliceId}}/games
+  body: none
+  auth: none
+}
+
+tests {
+  test("returns 200 with the page envelope", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getHeader("content-type")).to.contain("application/json");
+    const body = res.getBody();
+    expect(body.totalElements).to.equal(4);
+    expect(body.totalPages).to.equal(1);
+    expect(body.page).to.equal(0);
+    expect(body.size).to.equal(25);
+  });
+
+  test("excludes games Alice did not play and sorts newest first", function() {
+    const dates = res.getBody().content.map((g) => g.date);
+    expect(dates).to.eql(["2026-10-04", "2026-10-03", "2026-10-02", "2026-10-01"]);
+  });
+
+  test("each game is shown from Alice's perspective", function() {
+    const content = res.getBody().content;
+    expect(content.map((g) => g.color)).to.eql(["WHITE", "BLACK", "BLACK", "WHITE"]);
+    expect(content.map((g) => g.outcome)).to.eql(["DRAW", "WIN", "LOSS", "WIN"]);
+    expect(content.map((g) => g.playerRating)).to.eql([1550, 1550, 1500, 1500]);
+    expect(content.map((g) => g.opponentRating)).to.eql([1620, 1620, 1480, 1480]);
+    const newest = content[0];
+    expect(newest.gameId).to.equal(bru.getVar("pgGame4Id"));
+    expect(newest.opponentId).to.equal(bru.getVar("pgCarlaId"));
+    expect(newest.opponentName).to.equal("Carla C. (Castillo)");
+    expect(newest.gameType).to.equal("RAPID");
+    expect(newest.time).to.equal("10+0");
+  });
+}

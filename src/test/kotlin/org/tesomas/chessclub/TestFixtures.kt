@@ -17,7 +17,8 @@ object TestFixtures {
         rapidElo: Int = 2850,
         blitzElo: Int = 2830,
         bulletElo: Int = 2800,
-        classicalElo: Int = 2860
+        classicalElo: Int = 2860,
+        birthDate: LocalDate? = null
     ): Player = Player(
         id = id,
         firstName = firstName,
@@ -25,7 +26,8 @@ object TestFixtures {
         rapidElo = rapidElo,
         blitzElo = blitzElo,
         bulletElo = bulletElo,
-        classicalElo = classicalElo
+        classicalElo = classicalElo,
+        birthDate = birthDate
     )
 
     fun aGame(
@@ -38,15 +40,17 @@ object TestFixtures {
         result: GameResult = GameResult.WHITE_WINS,
         time: String = "10+0",
         date: LocalDate = LocalDate.of(2024, 1, 15),
-        pgn: String = "1. e4 e5 2. Nf3 Nc6"
+        pgn: String = "1. e4 e5 2. Nf3 Nc6",
+        whitePlayerRating: Int = 2850,
+        blackPlayerRating: Int = 2800
     ): Game = Game(
         id = id,
         whitePlayerId = whitePlayerId,
         blackPlayerId = blackPlayerId,
         whitePlayerName = whitePlayerName,
         blackPlayerName = blackPlayerName,
-        whitePlayerRating = 2850,
-        blackPlayerRating = 2800,
+        whitePlayerRating = whitePlayerRating,
+        blackPlayerRating = blackPlayerRating,
         gameType = gameType,
         result = result,
         time = time,

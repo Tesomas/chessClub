@@ -26,12 +26,16 @@
         <tr>
           <td class="date-cell">{{ game.date }}</td>
           <td class="player-cell">
-            <span class="player-name">{{ game.whitePlayerName }}</span>
+            <a class="player-name" [routerLink]="['/players', game.whitePlayerId]">{{
+              game.whitePlayerName
+            }}</a>
             <span class="rating">{{ game.whitePlayerRating }}</span>
           </td>
           <td class="result-cell">{{ resultLabel[game.result] }}</td>
           <td class="player-cell">
-            <span class="player-name">{{ game.blackPlayerName }}</span>
+            <a class="player-name" [routerLink]="['/players', game.blackPlayerId]">{{
+              game.blackPlayerName
+            }}</a>
             <span class="rating">{{ game.blackPlayerRating }}</span>
           </td>
           <td class="type-cell">{{ game.gameType | lowercase }}</td>

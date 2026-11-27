@@ -1,0 +1,17 @@
+meta {
+  name: Delete player Bob
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/api/players/{{pgBobId}}
+  body: none
+  auth: none
+}
+
+tests {
+  test("returns 204", function() {
+    expect(res.getStatus()).to.equal(204);
+  });
+}

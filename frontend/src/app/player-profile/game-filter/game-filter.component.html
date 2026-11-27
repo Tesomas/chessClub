@@ -1,0 +1,49 @@
+<form class="filters" [formGroup]="form" role="search" aria-label="Filter games">
+  <div class="field field-name">
+    <label for="filter-opponent-name">Opponent</label>
+    <div class="search">
+      <span class="search-icon" aria-hidden="true">⌕</span>
+      <input
+        id="filter-opponent-name"
+        type="search"
+        formControlName="opponentName"
+        placeholder="Search by name"
+        autocomplete="off"
+        spellcheck="false"
+        [maxLength]="maxNameLength"
+      />
+    </div>
+  </div>
+
+  <fieldset class="field field-dates" [class.invalid]="errors().dateRange">
+    <legend>Date</legend>
+    <div class="range">
+      <input
+        id="filter-from"
+        type="date"
+        formControlName="from"
+        aria-label="From date"
+        [attr.aria-invalid]="errors().dateRange ? 'true' : null"
+        [attr.aria-describedby]="errors().dateRange ? 'filter-date-error' : null"
+      />
+      <span class="range-sep" aria-hidden="true">–</span>
+      <input
+        id="filter-to"
+        type="date"
+        formControlName="to"
+        aria-label="To date"
+        [attr.aria-invalid]="errors().dateRange ? 'true' : null"
+        [attr.aria-describedby]="errors().dateRange ? 'filter-date-error' : null"
+      />
+    </div>
+    @if (errors().dateRange) {
+      <span id="filter-date-error" class="range-error" data-error="dateRange" role="alert">
+        Start date must be on or before the end date.
+      </span>
+    }
+  </fieldset>
+
+  <button type="reset" class="btn-reset" [disabled]="isEmpty()" (click)="reset($event)">
+    Reset
+  </button>
+</form>

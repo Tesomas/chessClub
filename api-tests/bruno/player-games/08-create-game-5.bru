@@ -1,0 +1,32 @@
+meta {
+  name: Create game 5
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/api/games
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "whitePlayerId": "{{pgBobId}}",
+    "blackPlayerId": "{{pgCarlaId}}",
+    "gameType": "BLITZ",
+    "result": "DRAW",
+    "time": "3+2",
+    "date": "2026-10-05"
+  }
+}
+
+script:post-response {
+  bru.setVar("pgGame5Id", res.getBody().id);
+}
+
+tests {
+  test("returns 201", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+}

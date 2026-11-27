@@ -1,0 +1,17 @@
+meta {
+  name: Delete player Alice
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{baseUrl}}/api/players/{{pgAliceId}}
+  body: none
+  auth: none
+}
+
+tests {
+  test("returns 204", function() {
+    expect(res.getStatus()).to.equal(204);
+  });
+}

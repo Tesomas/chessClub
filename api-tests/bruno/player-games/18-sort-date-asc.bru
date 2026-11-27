@@ -1,0 +1,18 @@
+meta {
+  name: Sort by date ascending
+  type: http
+  seq: 18
+}
+
+get {
+  url: {{baseUrl}}/api/players/{{pgAliceId}}/games?sort=date&direction=asc
+  body: none
+  auth: none
+}
+
+tests {
+  test("oldest first", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().content.map((g) => g.date)).to.eql(["2026-10-01", "2026-10-02", "2026-10-03", "2026-10-04"]);
+  });
+}

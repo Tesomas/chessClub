@@ -27,6 +27,8 @@ class SwaggerConfigTest {
         assertTrue(body.contains("\"title\":\"ChessClub API\""))
         assertTrue(body.contains("\"/api/players/{id}\""))
         assertTrue(body.contains("\"/api/games/{id}\""))
+        assertTrue(body.contains("\"/api/players/{id}/games\""))
+        assertTrue(body.contains("\"PageResponsePlayerGameView\""), "generic page schema is named per content type")
     }
 
     @Test

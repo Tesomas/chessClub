@@ -1,0 +1,18 @@
+meta {
+  name: Inclusive date range
+  type: http
+  seq: 14
+}
+
+get {
+  url: {{baseUrl}}/api/players/{{pgAliceId}}/games?from=2026-10-02&to=2026-10-03
+  body: none
+  auth: none
+}
+
+tests {
+  test("keeps both edge days", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().content.map((g) => g.date)).to.eql(["2026-10-03", "2026-10-02"]);
+  });
+}

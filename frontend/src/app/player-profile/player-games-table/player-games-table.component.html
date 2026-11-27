@@ -1,0 +1,94 @@
+@let data = page();
+
+@if (data.content.length === 0) {
+  <div class="empty">
+    @if (isPastEnd()) {
+      <p>This page is past the last page of results.</p>
+      <button type="button" class="link-btn" (click)="goTo(0)">Back to the first page</button>
+    } @else {
+      <p>No games match these filters.</p>
+    }
+  </div>
+} @else {
+  <div class="table-scroll">
+    <table class="games">
+      <thead>
+        <tr>
+          <th data-sort="date" [attr.aria-sort]="ariaSort('date')">
+            <button
+              type="button"
+              class="sort-btn"
+              [class.active]="sort() === 'date'"
+              (click)="toggleSort('date')"
+            >
+              Date<span class="sort-arrow" aria-hidden="true">{{ arrow('date') }}</span>
+            </button>
+          </th>
+          <th>Mode</th>
+          <th>Color</th>
+          <th data-sort="opponentName" [attr.aria-sort]="ariaSort('opponentName')">
+            <button
+              type="button"
+              class="sort-btn"
+              [class.active]="sort() === 'opponentName'"
+              (click)="toggleSort('opponentName')"
+            >
+              Opponent<span class="sort-arrow" aria-hidden="true">{{ arrow('opponentName') }}</span>
+            </button>
+          </th>
+          <th class="num">Opp. rating</th>
+          <th class="num">My rating</th>
+          <th class="center">Result</th>
+          <th class="col-time">Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (game of data.content; track game.gameId) {
+          <tr>
+            <td class="muted nowrap">{{ game.date }}</td>
+            <td class="muted">{{ game.gameType | titlecase }}</td>
+            <td>
+              <span class="side">
+                <span
+                  class="swatch"
+                  [class.swatch-black]="game.color === 'BLACK'"
+                  aria-hidden="true"
+                ></span>
+                {{ game.color | titlecase }}
+              </span>
+            </td>
+            <td>
+              <a class="opponent" [routerLink]="['/players', game.opponentId]">{{
+                game.opponentName
+              }}</a>
+            </td>
+            <td class="num muted">{{ game.opponentRating }}</td>
+            <td class="num">{{ game.playerRating }}</td>
+            <td class="center">
+              <span
+                class="badge {{ badge[game.outcome].css }}"
+                [attr.title]="badge[game.outcome].label"
+              >
+                {{ badge[game.outcome].letter }}
+              </span>
+            </td>
+            <td class="muted col-time">{{ game.time }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
+
+<nav class="pager" aria-label="Game pages">
+  <button type="button" class="pager-prev" [attr.aria-disabled]="isFirst()" (click)="previous()">
+    ‹ Prev
+  </button>
+  <span class="pager-status" aria-live="polite">
+    Page {{ data.totalPages === 0 ? 0 : data.page + 1 }} of {{ data.totalPages }} ·
+    {{ data.totalElements }} {{ data.totalElements === 1 ? 'game' : 'games' }}
+  </span>
+  <button type="button" class="pager-next" [attr.aria-disabled]="isLast()" (click)="next()">
+    Next ›
+  </button>
+</nav>
