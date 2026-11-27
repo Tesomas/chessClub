@@ -2,11 +2,12 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { LowerCasePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { GameService, Game, RESULT_LABEL } from '../game.service';
+import { RatingChangeComponent } from '../rating-change.component';
 
 @Component({
   selector: 'app-games',
   standalone: true,
-  imports: [RouterLink, LowerCasePipe],
+  imports: [RouterLink, LowerCasePipe, RatingChangeComponent],
   templateUrl: './games.component.html',
   styleUrl: './games.component.scss',
 })

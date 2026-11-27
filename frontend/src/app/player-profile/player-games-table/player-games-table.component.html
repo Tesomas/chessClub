@@ -62,8 +62,14 @@
                 game.opponentName
               }}</a>
             </td>
-            <td class="num muted">{{ game.opponentRating }}</td>
-            <td class="num">{{ game.playerRating }}</td>
+            <td class="num muted">
+              {{ game.opponentRating }}
+              <app-rating-change [change]="game.opponentRatingChange" />
+            </td>
+            <td class="num">
+              {{ game.playerRating }}
+              <app-rating-change [change]="game.playerRatingChange" />
+            </td>
             <td class="center">
               <span
                 class="badge {{ badge[game.outcome].css }}"

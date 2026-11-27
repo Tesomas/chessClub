@@ -12,9 +12,11 @@ function game(overrides: Partial<PlayerGameView> = {}): PlayerGameView {
     color: 'WHITE',
     outcome: 'WIN',
     playerRating: 1500,
+    playerRatingChange: 8,
     opponentId: 'p2',
     opponentName: 'Bob Brooks',
     opponentRating: 1480,
+    opponentRatingChange: -8,
     ...overrides,
   };
 }
@@ -69,11 +71,18 @@ describe('PlayerGamesTableComponent', () => {
       'Blitz',
       'White',
       'Bob Brooks',
-      '1480',
-      '1500',
+      '1480 −8',
+      '1500 +8',
       'W',
       '3+2',
     ]);
+  });
+
+  it('colours the rating changes: gain green, loss red', async () => {
+    await render(page([game({ playerRatingChange: 8, opponentRatingChange: -8 })]));
+    const [opp, mine] = Array.from(rows()[0].querySelectorAll('.rating-change'));
+    expect(mine.classList).toContain('gain');
+    expect(opp.classList).toContain('loss');
   });
 
   it('renders semantic outcome badges', async () => {

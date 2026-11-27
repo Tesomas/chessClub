@@ -14,8 +14,6 @@ body:json {
   {
     "whitePlayerId": "{{whiteId}}",
     "blackPlayerId": "{{blackId}}",
-    "whitePlayerRating": 2850,
-    "blackPlayerRating": 2800,
     "gameType": "RAPID",
     "result": "WHITE_WINS",
     "time": "10+0",
@@ -42,6 +40,15 @@ tests {
     const body = res.getBody();
     expect(body.whitePlayerName).to.equal("Magnus Carlsen");
     expect(body.blackPlayerName).to.equal("Hikaru Nakamura");
+  });
+
+  test("records the ratings before the game and the points each side gained or lost", function() {
+    const body = res.getBody();
+    expect(body.whitePlayerRating).to.equal(2850);
+    expect(body.blackPlayerRating).to.equal(2800);
+    // K = 20; the 50-point favourite was expected to score 0.571
+    expect(body.whitePlayerRatingChange).to.equal(9);
+    expect(body.blackPlayerRatingChange).to.equal(-9);
   });
 
   test("echoes the game details", function() {

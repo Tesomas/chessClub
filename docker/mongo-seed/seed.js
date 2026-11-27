@@ -9,8 +9,8 @@
 //
 // Everything is driven by a seeded PRNG, so every build produces the same data
 // (game ObjectIds aside). Ratings are simulated with Elo updates game by game: the
-// rating snapshot on each game is the player's rating before that game, and the
-// player documents hold the final ratings.
+// rating snapshot on each game is the player's rating before that game, the game records the
+// points each side gained or lost, and the player documents hold the final ratings.
 
 const DB_NAME = "chessclub";
 const PLAYER_COLLECTION = "Players"; // matches @Document(collection = "Players")
@@ -167,10 +167,13 @@ function simulateGameType(players, gameType) {
       const whiteRating = ratings[w];
       const blackRating = ratings[b];
       const result = playResult(whiteRating, blackRating, gameType.drawRate);
-      const delta = K_FACTOR * (whiteScore(result) - expectedScore(whiteRating, blackRating));
+      // Same formula and rounding as the app's EloCalculator: round white's change once and mirror it.
+      const whiteChange = Math.round(
+        K_FACTOR * (whiteScore(result) - expectedScore(whiteRating, blackRating))
+      );
 
-      ratings[w] = Math.round(whiteRating + delta);
-      ratings[b] = Math.round(blackRating - delta);
+      ratings[w] = whiteRating + whiteChange;
+      ratings[b] = blackRating - whiteChange;
 
       games.push({
         whitePlayerId: players[w].id.toHexString(),
@@ -179,6 +182,8 @@ function simulateGameType(players, gameType) {
         blackPlayerName: fullName(players[b]),
         whitePlayerRating: whiteRating,
         blackPlayerRating: blackRating,
+        whitePlayerRatingChange: whiteChange,
+        blackPlayerRatingChange: -whiteChange,
         gameType: gameType.type,
         result,
         time: gameType.time,

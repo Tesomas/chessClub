@@ -23,9 +23,12 @@ export interface PlayerGameView {
   color: PlayerColor;
   outcome: PlayerOutcome;
   playerRating: number;
+  /** ELO points gained (positive) or lost (negative) from this game. */
+  playerRatingChange: number;
   opponentId: string;
   opponentName: string;
   opponentRating: number;
+  opponentRatingChange: number;
 }
 
 export interface Page<T> {

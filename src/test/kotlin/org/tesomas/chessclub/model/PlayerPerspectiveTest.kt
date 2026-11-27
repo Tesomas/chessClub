@@ -38,7 +38,8 @@ class PlayerPerspectiveTest {
         val game = aGame(
             "p1", "p2", id = "g1", whitePlayerName = "Alice Anders", blackPlayerName = "Ben Brooks",
             gameType = GameType.BLITZ, result = GameResult.WHITE_WINS, time = "3+2",
-            date = LocalDate.of(2026, 10, 1), whitePlayerRating = 1500, blackPlayerRating = 1480
+            date = LocalDate.of(2026, 10, 1), whitePlayerRating = 1500, blackPlayerRating = 1480,
+            whitePlayerRatingChange = 9, blackPlayerRatingChange = -9
         )
 
         // Act
@@ -49,7 +50,8 @@ class PlayerPerspectiveTest {
             PlayerGameView(
                 gameId = "g1", date = LocalDate.of(2026, 10, 1), gameType = GameType.BLITZ, time = "3+2",
                 color = PlayerColor.WHITE, outcome = PlayerOutcome.WIN, playerRating = 1500,
-                opponentId = "p2", opponentName = "Ben Brooks", opponentRating = 1480
+                playerRatingChange = 9, opponentId = "p2", opponentName = "Ben Brooks", opponentRating = 1480,
+                opponentRatingChange = -9
             ),
             view
         )
@@ -60,7 +62,8 @@ class PlayerPerspectiveTest {
         // Arrange
         val game = aGame(
             "p1", "p2", id = "g1", whitePlayerName = "Alice Anders", blackPlayerName = "Ben Brooks",
-            result = GameResult.WHITE_WINS, whitePlayerRating = 1500, blackPlayerRating = 1480
+            result = GameResult.WHITE_WINS, whitePlayerRating = 1500, blackPlayerRating = 1480,
+            whitePlayerRatingChange = 9, blackPlayerRatingChange = -9
         )
 
         // Act
@@ -70,9 +73,11 @@ class PlayerPerspectiveTest {
         assertEquals(PlayerColor.BLACK, view.color)
         assertEquals(PlayerOutcome.LOSS, view.outcome)
         assertEquals(1480, view.playerRating)
+        assertEquals(-9, view.playerRatingChange)
         assertEquals("p1", view.opponentId)
         assertEquals("Alice Anders", view.opponentName)
         assertEquals(1500, view.opponentRating)
+        assertEquals(9, view.opponentRatingChange)
     }
 
     @Test

@@ -23,6 +23,8 @@ describe('GamesComponent', () => {
           blackPlayerName: 'Bob Brooks',
           whitePlayerRating: 1500,
           blackPlayerRating: 1480,
+          whitePlayerRatingChange: -1,
+          blackPlayerRatingChange: 1,
           gameType: 'BLITZ',
           result: 'DRAW',
           time: '3+2',
@@ -37,6 +39,13 @@ describe('GamesComponent', () => {
     expect(links).toEqual([
       ['Ann Lee', '/players/w1'],
       ['Bob Brooks', '/players/b1'],
+    ]);
+    const changes = Array.from(
+      (fixture.nativeElement as HTMLElement).querySelectorAll('.rating-change'),
+    ).map((el) => [el.textContent?.trim(), el.classList.contains('gain'), el.classList.contains('loss')]);
+    expect(changes).toEqual([
+      ['−1', false, true],
+      ['+1', true, false],
     ]);
   });
 });

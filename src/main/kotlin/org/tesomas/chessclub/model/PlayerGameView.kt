@@ -26,6 +26,9 @@ data class PlayerGameView(
     @Schema(description = "The player's ELO rating at game time", example = "1500")
     val playerRating: Int,
 
+    @Schema(description = "ELO points the player gained (positive) or lost (negative) from this game", example = "8")
+    val playerRatingChange: Int,
+
     @Schema(description = "MongoDB ObjectId of the opponent", example = "64a1b2c3d4e5f6a7b8c9d0e2")
     val opponentId: String,
 
@@ -33,7 +36,10 @@ data class PlayerGameView(
     val opponentName: String,
 
     @Schema(description = "Opponent's ELO rating at game time", example = "1480")
-    val opponentRating: Int
+    val opponentRating: Int,
+
+    @Schema(description = "ELO points the opponent gained (positive) or lost (negative) from this game", example = "-8")
+    val opponentRatingChange: Int
 ) {
     companion object {
         /** Maps [game] to the view of [playerId]; the player is taken as black unless they are white. */
@@ -48,9 +54,11 @@ data class PlayerGameView(
                 color = color,
                 outcome = PlayerOutcome.from(game.result, color),
                 playerRating = if (isWhite) game.whitePlayerRating else game.blackPlayerRating,
+                playerRatingChange = if (isWhite) game.whitePlayerRatingChange else game.blackPlayerRatingChange,
                 opponentId = if (isWhite) game.blackPlayerId else game.whitePlayerId,
                 opponentName = if (isWhite) game.blackPlayerName else game.whitePlayerName,
-                opponentRating = if (isWhite) game.blackPlayerRating else game.whitePlayerRating
+                opponentRating = if (isWhite) game.blackPlayerRating else game.whitePlayerRating,
+                opponentRatingChange = if (isWhite) game.blackPlayerRatingChange else game.whitePlayerRatingChange
             )
         }
     }

@@ -13,6 +13,9 @@ export interface Game {
   blackPlayerName: string;
   whitePlayerRating: number;
   blackPlayerRating: number;
+  /** ELO points gained (positive) or lost (negative) from this game. */
+  whitePlayerRatingChange: number;
+  blackPlayerRatingChange: number;
   gameType: GameType;
   result: GameResult;
   time: string;
