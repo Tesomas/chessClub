@@ -9,13 +9,14 @@ import org.testcontainers.utility.DockerImageName
 /**
  * Starts a throwaway MongoDB container and wires it into Spring via @ServiceConnection.
  * Import it into any test that needs a real database; requires Docker to be running.
+ * It runs as a single-node replica set, which MongoDB requires for the transactions `GameService` uses.
  */
 @TestConfiguration(proxyBeanMethods = false)
 class TestcontainersConfiguration {
 
     @Bean
     @ServiceConnection
-    fun mongoDbContainer(): MongoDBContainer = MongoDBContainer(DockerImageName.parse(MONGO_IMAGE))
+    fun mongoDbContainer(): MongoDBContainer = MongoDBContainer(DockerImageName.parse(MONGO_IMAGE)).withReplicaSet()
 
     private companion object {
         const val MONGO_IMAGE = "mongo:7"

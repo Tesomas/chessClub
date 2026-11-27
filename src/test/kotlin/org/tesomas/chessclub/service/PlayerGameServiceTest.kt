@@ -69,12 +69,14 @@ class PlayerGameServiceTest {
                 PlayerGameView(
                     gameId = "g1", date = LocalDate.of(2026, 10, 1), gameType = GameType.BLITZ, time = "3+2",
                     color = PlayerColor.WHITE, outcome = PlayerOutcome.WIN, playerRating = 1500,
-                    opponentId = "p2", opponentName = "Ben Brooks", opponentRating = 1480
+                    playerRatingChange = 0, opponentId = "p2", opponentName = "Ben Brooks", opponentRating = 1480,
+                    opponentRatingChange = 0
                 ),
                 PlayerGameView(
                     gameId = "g2", date = LocalDate.of(2026, 9, 1), gameType = GameType.RAPID, time = "10+0",
                     color = PlayerColor.BLACK, outcome = PlayerOutcome.LOSS, playerRating = 1490,
-                    opponentId = "p3", opponentName = "Carla Castillo", opponentRating = 1620
+                    playerRatingChange = 0, opponentId = "p3", opponentName = "Carla Castillo", opponentRating = 1620,
+                    opponentRatingChange = 0
                 )
             ),
             result.content

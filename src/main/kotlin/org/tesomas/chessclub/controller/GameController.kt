@@ -51,7 +51,7 @@ class GameController(private val gameService: GameService) {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(
         summary = "Record a new game",
-        description = "Creates a game record. `whitePlayerId` and `blackPlayerId` must reference existing players — the service validates both before saving. Player display names are denormalized from current player records at creation time."
+        description = "Creates a game record. `whitePlayerId` and `blackPlayerId` must reference existing players — the service validates both before saving. Player display names and ratings are snapshotted from current player records at creation time. ELO is then applied: the game records the points each player gained or lost, and both players' rating for the game type is updated."
     )
     @ApiResponses(value = [
         ApiResponse(
@@ -66,7 +66,7 @@ class GameController(private val gameService: GameService) {
     @PutMapping("/{id}")
     @Operation(
         summary = "Update a game record",
-        description = "Replaces all fields of the game. Player IDs are re-validated on update."
+        description = "Replaces the game's details. Player IDs are re-validated on update. The rating snapshot and rating changes are kept from the stored game; editing does not re-rate the game or change player ratings."
     )
     @ApiResponses(value = [
         ApiResponse(

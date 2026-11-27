@@ -5,8 +5,4 @@ services:
     container_name: chessclub-mongo-seed
     ports:
       - "27017:27017"
-    healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
+    # Health check (initiates the single-node replica set the app's transactions need) is in the Dockerfile.

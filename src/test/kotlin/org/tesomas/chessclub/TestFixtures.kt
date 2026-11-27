@@ -42,7 +42,9 @@ object TestFixtures {
         date: LocalDate = LocalDate.of(2024, 1, 15),
         pgn: String = "1. e4 e5 2. Nf3 Nc6",
         whitePlayerRating: Int = 2850,
-        blackPlayerRating: Int = 2800
+        blackPlayerRating: Int = 2800,
+        whitePlayerRatingChange: Int = 0,
+        blackPlayerRatingChange: Int = 0
     ): Game = Game(
         id = id,
         whitePlayerId = whitePlayerId,
@@ -51,6 +53,8 @@ object TestFixtures {
         blackPlayerName = blackPlayerName,
         whitePlayerRating = whitePlayerRating,
         blackPlayerRating = blackPlayerRating,
+        whitePlayerRatingChange = whitePlayerRatingChange,
+        blackPlayerRatingChange = blackPlayerRatingChange,
         gameType = gameType,
         result = result,
         time = time,

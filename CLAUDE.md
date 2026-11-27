@@ -94,6 +94,7 @@ controller/  — REST controllers under /api/players, /api/players/{id}/games an
 - `Player` — club member with first/last name, four ELO fields (rapid, blitz, bullet, classical) and an optional `birthDate` (`LocalDate`, JSON `yyyy-MM-dd` or null)
 - `Game` — recorded game linking two player IDs (soft refs), rating snapshots at game time, `GameType` enum, time-control string, date, and PGN string
 - Player IDs in Game are soft references — `GameService` checks `playerRepository.existsById` at create/update time
+- ELO is applied when a game is created (`GameService.create` → `EloCalculator`, K = 20, same formula as the seed): the game stores each player's rating *before* the game (`white/blackPlayerRating`) and the points gained/lost (`white/blackPlayerRatingChange`, zero-sum), and both players' rating for that game type is updated. Self-play games change nothing. `create` is `@Transactional` (`MongoTransactionManager` in `config/MongoConfig`): the game and both rating updates commit together or not at all (`GameServiceTransactionTest`). Editing a game keeps its stored snapshot and changes and does not re-rate; deleting a game does not reverse its rating change.
 - `LocalDate`s are stored as BSON dates at UTC midnight regardless of the server's time zone (driver java.time codecs, `config/MongoConfig`, proven by `MongoConfigTest`), matching `docker/mongo-seed/seed.js`. `@DataMongoTest` slices must `@Import(MongoConfig::class)`. Older builds stored local midnight; that reads back correctly only for data written west of UTC (all ours so far, US Central). Data written by an older build on a server east of UTC sits on the previous UTC day and would need normalizing before use.
 - A self-play game (white and black are the same player) is listed once, viewed from the white side.
 
@@ -101,7 +102,7 @@ controller/  — REST controllers under /api/players, /api/players/{id}/games an
 
 `GET /api/players/{id}/games` — the player's games from their perspective, as `PageResponse<PlayerGameView>`
 (`content`, `page`, `size`, `totalElements`, `totalPages`; each item: `gameId`, `date`, `gameType`, `time`, `color`,
-`outcome`, `playerRating`, `opponentId`, `opponentName`, `opponentRating`). Optional query params only:
+`outcome`, `playerRating`, `playerRatingChange`, `opponentId`, `opponentName`, `opponentRating`, `opponentRatingChange`). Optional query params only:
 `opponentName` (case-insensitive substring of the opponent's denormalized name; trimmed, blank = no filter, max 100
 chars, no control characters; regex-escaped so it is matched literally), `from`/`to` (inclusive ISO dates within
 1900-01-01..9999-12-31), `page` (0-based, default 0),
@@ -117,7 +118,7 @@ Indexes `{whitePlayerId:1,date:-1}` / `{blackPlayerId:1,date:-1}` (`@CompoundInd
 (always for `opponentName`, which is computed, and in practice for `date` too). That is fine at club scale (a few
 hundred games per player); a large history would need a different approach.
 
-MongoDB URI defaults to `mongodb://localhost:27017/chessclub`; override with `MONGODB_URI` env var.
+MongoDB URI defaults to `mongodb://localhost:27017/chessclub`; override with `MONGODB_URI` env var. **MongoDB must be a replica set** (a single node is fine): transactions are not supported on a standalone server, so recording a game fails there with "Transaction numbers are only allowed on a replica set member". `docker compose up mongo-seed` runs a seeded single-node replica set `rs0` (`docker/mongo-seed/replica-set.js`); `TestcontainersConfiguration` uses `withReplicaSet()`. A `mongo-seed` container created from an older image is standalone: recreate it (`docker compose up -d --build --force-recreate mongo-seed`).
 
 ## Logging
 

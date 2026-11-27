@@ -8,7 +8,9 @@ members can log in later. See [docs/GOALS.md](docs/GOALS.md) for the goals and d
 
 ## Quick start
 
-Prerequisites: JDK 24, a MongoDB instance (or Docker), and Node.js for the frontend.
+Prerequisites: JDK 24, a MongoDB replica set (a single node is fine; or Docker), and Node.js for the frontend.
+Recording a game uses a MongoDB transaction, which a standalone MongoDB server does not support.
+`docker compose up -d mongo-seed` starts a seeded single-node replica set.
 
 ```bash
 # Backend, against MongoDB at mongodb://localhost:27017/chessclub (override with MONGODB_URI)

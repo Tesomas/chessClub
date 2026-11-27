@@ -33,11 +33,17 @@ data class Game(
     @Schema(description = "Display name of the black player at game time (denormalized snapshot)", example = "Fabiano Caruana", accessMode = Schema.AccessMode.READ_ONLY)
     val blackPlayerName: String = "",
 
-    @Schema(description = "ELO rating of the white player at the time the game was played", example = "2850")
+    @Schema(description = "ELO rating of the white player before the game (snapshot, set by the server on create)", example = "2850")
     val whitePlayerRating: Int,
 
-    @Schema(description = "ELO rating of the black player at the time the game was played", example = "2820")
+    @Schema(description = "ELO rating of the black player before the game (snapshot, set by the server on create)", example = "2820")
     val blackPlayerRating: Int,
+
+    @Schema(description = "ELO points the white player gained (positive) or lost (negative) from this game", example = "8", accessMode = Schema.AccessMode.READ_ONLY)
+    val whitePlayerRatingChange: Int = 0,
+
+    @Schema(description = "ELO points the black player gained (positive) or lost (negative) from this game", example = "-8", accessMode = Schema.AccessMode.READ_ONLY)
+    val blackPlayerRatingChange: Int = 0,
 
     @Schema(description = "Time control category of the game")
     val gameType: GameType,
@@ -50,7 +56,7 @@ data class Game(
 
     @Schema(description = "Date the game was played", example = "2024-11-25")
     val date: LocalDate,
-      
+
     @Schema(description = "Portable Game Notation (PGN) of the full game", example = "1. e4 e5 2. Nf3 Nc6 3. Bb5 *")
     val pgn: String? = null
 

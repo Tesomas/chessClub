@@ -30,8 +30,11 @@ tests {
     const content = res.getBody().content;
     expect(content.map((g) => g.color)).to.eql(["WHITE", "BLACK", "BLACK", "WHITE"]);
     expect(content.map((g) => g.outcome)).to.eql(["DRAW", "WIN", "LOSS", "WIN"]);
-    expect(content.map((g) => g.playerRating)).to.eql([1550, 1550, 1500, 1500]);
-    expect(content.map((g) => g.opponentRating)).to.eql([1620, 1620, 1480, 1480]);
+    // Each game snapshots the ratings before it; earlier games of the same type moved them (K = 20)
+    expect(content.map((g) => g.playerRating)).to.eql([1562, 1550, 1509, 1500]);
+    expect(content.map((g) => g.opponentRating)).to.eql([1608, 1620, 1471, 1480]);
+    expect(content.map((g) => g.playerRatingChange)).to.eql([1, 12, -11, 9]);
+    expect(content.map((g) => g.opponentRatingChange)).to.eql([-1, -12, 11, -9]);
     const newest = content[0];
     expect(newest.gameId).to.equal(bru.getVar("pgGame4Id"));
     expect(newest.opponentId).to.equal(bru.getVar("pgCarlaId"));

@@ -73,6 +73,20 @@ class GameControllerTest {
     }
 
     @Test
+    fun `POST game records the rating change and updates both players' ELO`() {
+        // Both fixture players start at rapid 2850, so a decisive game is worth K/2 = 10 points
+        val response = restTemplate.postForEntity("/api/games", testRequest(), Game::class.java)
+        assertEquals(HttpStatus.CREATED, response.statusCode)
+        assertEquals(2850, response.body?.whitePlayerRating)
+        assertEquals(2850, response.body?.blackPlayerRating)
+        assertEquals(10, response.body?.whitePlayerRatingChange)
+        assertEquals(-10, response.body?.blackPlayerRatingChange)
+        assertEquals(2860, playerRepository.findById(requireNotNull(white.id)).map { it.rapidElo }.orElse(null))
+        assertEquals(2840, playerRepository.findById(requireNotNull(black.id)).map { it.rapidElo }.orElse(null))
+        assertEquals(2830, playerRepository.findById(requireNotNull(white.id)).map { it.blitzElo }.orElse(null))
+    }
+
+    @Test
     fun `POST game with unknown player returns 404`() {
         val response = restTemplate.postForEntity(
             "/api/games",

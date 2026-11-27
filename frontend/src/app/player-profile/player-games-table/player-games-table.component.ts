@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { TitleCasePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { RatingChangeComponent } from '../../rating-change.component';
 import {
   Page,
   PlayerGameSort,
@@ -34,7 +35,7 @@ const INITIAL_DIRECTION: Record<PlayerGameSort, SortDirection> = {
 
 @Component({
   selector: 'app-player-games-table',
-  imports: [RouterLink, TitleCasePipe],
+  imports: [RouterLink, TitleCasePipe, RatingChangeComponent],
   templateUrl: './player-games-table.component.html',
   styleUrl: './player-games-table.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

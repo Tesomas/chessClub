@@ -38,8 +38,8 @@ class PlayerGameControllerWebTest {
 
     private val view = PlayerGameView(
         gameId = "g1", date = LocalDate.of(2026, 10, 1), gameType = GameType.BLITZ, time = "3+2",
-        color = PlayerColor.WHITE, outcome = PlayerOutcome.WIN, playerRating = 1500,
-        opponentId = "p2", opponentName = "Bob Brooks", opponentRating = 1480
+        color = PlayerColor.WHITE, outcome = PlayerOutcome.WIN, playerRating = 1500, playerRatingChange = 9,
+        opponentId = "p2", opponentName = "Bob Brooks", opponentRating = 1480, opponentRatingChange = -9
     )
 
     @BeforeEach
@@ -62,10 +62,12 @@ class PlayerGameControllerWebTest {
             jsonPath("$.content[0].color") { value("WHITE") }
             jsonPath("$.content[0].outcome") { value("WIN") }
             jsonPath("$.content[0].playerRating") { value(1500) }
+            jsonPath("$.content[0].playerRatingChange") { value(9) }
             jsonPath("$.content[0].opponentId") { value("p2") }
             jsonPath("$.content[0].opponentName") { value("Bob Brooks") }
             jsonPath("$.content[0].opponentRating") { value(1480) }
-            jsonPath("$.content[0].length()") { value(10) }
+            jsonPath("$.content[0].opponentRatingChange") { value(-9) }
+            jsonPath("$.content[0].length()") { value(12) }
             jsonPath("$.page") { value(0) }
             jsonPath("$.size") { value(25) }
             jsonPath("$.totalElements") { value(140) }

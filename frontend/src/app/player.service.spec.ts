@@ -86,9 +86,11 @@ describe('PlayerService', () => {
           color: 'WHITE',
           outcome: 'WIN',
           playerRating: 1500,
+          playerRatingChange: 8,
           opponentId: 'p2',
           opponentName: 'Bob Brooks',
           opponentRating: 1480,
+          opponentRatingChange: -8,
         },
       ],
     };

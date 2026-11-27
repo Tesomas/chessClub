@@ -30,6 +30,7 @@
               game.whitePlayerName
             }}</a>
             <span class="rating">{{ game.whitePlayerRating }}</span>
+            <app-rating-change [change]="game.whitePlayerRatingChange" />
           </td>
           <td class="result-cell">{{ resultLabel[game.result] }}</td>
           <td class="player-cell">
@@ -37,6 +38,7 @@
               game.blackPlayerName
             }}</a>
             <span class="rating">{{ game.blackPlayerRating }}</span>
+            <app-rating-change [change]="game.blackPlayerRatingChange" />
           </td>
           <td class="type-cell">{{ game.gameType | lowercase }}</td>
           <td class="time-cell">{{ game.time }}</td>
