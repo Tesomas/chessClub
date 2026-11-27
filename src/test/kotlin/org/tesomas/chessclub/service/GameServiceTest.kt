@@ -10,8 +10,10 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.tesomas.chessclub.TestFixtures.aGame
+import org.tesomas.chessclub.TestFixtures.aGameRequest
 import org.tesomas.chessclub.TestFixtures.aPlayer
 import org.tesomas.chessclub.model.Game
+import org.tesomas.chessclub.model.GameType
 import org.tesomas.chessclub.repository.GameRepository
 import org.tesomas.chessclub.repository.PlayerRepository
 import java.util.Optional
@@ -75,26 +77,29 @@ class GameServiceTest {
     }
 
     @Test
-    fun `create clears the id and denormalizes player names from player records`() {
+    fun `create denormalizes player names and rating snapshots from player records`() {
         // Arrange
         val saved = slot<Game>()
         every { gameRepository.save(capture(saved)) } answers { saved.captured.copy(id = "generated") }
-        val input = aGame("w1", "b1", id = "client-id", whitePlayerName = "spoofed", blackPlayerName = "spoofed")
+        val request = aGameRequest("w1", "b1", gameType = GameType.BLITZ)
 
         // Act
-        val result = service.create(input)
+        val result = service.create(request)
 
         // Assert
         assertNull(saved.captured.id)
         assertEquals("Magnus Carlsen", saved.captured.whitePlayerName)
         assertEquals("Hikaru Nakamura", saved.captured.blackPlayerName)
+        assertEquals(white.blitzElo, saved.captured.whitePlayerRating)
+        assertEquals(black.blitzElo, saved.captured.blackPlayerRating)
+        assertEquals(request.result, saved.captured.result)
         assertEquals("generated", result.id)
     }
 
     @Test
     fun `create throws PlayerNotFoundException when the white player is missing`() {
         // Act
-        val ex = assertThrows<PlayerNotFoundException> { service.create(aGame("missing", "b1")) }
+        val ex = assertThrows<PlayerNotFoundException> { service.create(aGameRequest("missing", "b1")) }
 
         // Assert
         assertEquals("Player missing not found", ex.message)
@@ -104,7 +109,7 @@ class GameServiceTest {
     @Test
     fun `create throws PlayerNotFoundException when the black player is missing`() {
         // Act
-        val ex = assertThrows<PlayerNotFoundException> { service.create(aGame("w1", "missing")) }
+        val ex = assertThrows<PlayerNotFoundException> { service.create(aGameRequest("w1", "missing")) }
 
         // Assert
         assertEquals("Player missing not found", ex.message)

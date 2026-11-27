@@ -41,14 +41,14 @@ class PlayerRepositoryTest {
     }
 
     @Test
-    fun `players are stored in the players collection`() {
+    fun `players are stored in the Players collection`() {
         // Act
         playerRepository.save(aPlayer())
 
         // Assert
-        assertTrue(mongoTemplate.collectionExists("players"))
-        assertEquals(1, mongoTemplate.getCollection("players").countDocuments())
-        assertEquals("players", mongoTemplate.getCollectionName(Player::class.java))
+        assertTrue(mongoTemplate.collectionExists("Players"))
+        assertEquals(1, mongoTemplate.getCollection("Players").countDocuments())
+        assertEquals("Players", mongoTemplate.getCollectionName(Player::class.java))
     }
 
     @Test
