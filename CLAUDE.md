@@ -67,7 +67,7 @@ Run these from the `frontend/` directory:
 # Install dependencies (first time only)
 npm install
 
-# Dev server (port 4200, proxies /api → localhost:8080)
+# Dev server (port 4200, proxies /api → localhost:8081)
 npm start
 
 # Production build

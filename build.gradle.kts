@@ -1,5 +1,3 @@
-import org.gradle.internal.impldep.org.jsoup.nodes.Document
-
 plugins {
     kotlin("jvm") version "2.2.21"
     kotlin("plugin.spring") version "2.2.21"
@@ -41,7 +39,6 @@ dependencies {
     implementation("tools.jackson.module:jackson-module-kotlin")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
 
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
     testImplementation("org.springframework.boot:spring-boot-starter-data-mongodb-test")
     testImplementation("org.springframework.boot:spring-boot-webmvc-test")
     testImplementation("org.springframework.boot:spring-boot-restclient")
@@ -73,10 +70,9 @@ tasks.test {
 
 tasks.jacocoTestReport {
     dependsOn(tasks.test)
-    reports {
-        Document.OutputSettings.Syntax.xml.required = true
-        Document.OutputSettings.Syntax.html.required = true
-    }
+    // Qualified with `reports.` so IDE auto-import can't resolve xml/html to an unrelated class
+    reports.xml.required = true
+    reports.html.required = true
 }
 
 val isWindows = System.getProperty("os.name").lowercase().contains("windows")

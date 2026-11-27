@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "skills": {
+    "angular-developer": {
+      "source": "angular/skills",
+      "sourceType": "github",
+      "skillPath": "angular-developer/SKILL.md",
+      "computedHash": "98a311b407bc2684094ccc6edf86549ae1a630fa4f445c42b8f7709b5274054e"
+    },
+    "angular-new-app": {
+      "source": "angular/skills",
+      "sourceType": "github",
+      "skillPath": "angular-new-app/SKILL.md",
+      "computedHash": "d9f712544847ab80ef7ed20043820afd275c394ca05340c2f20a0f051e35d945"
+    },
+    "kotlin-springboot": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "skillPath": "skills/kotlin-springboot/SKILL.md",
+      "computedHash": "beaa34d307bfcce5dd026e3b03c357f98f471b0de1b9fc6a0b7a64d132b74e95"
+    }
+  }
+}

@@ -56,7 +56,7 @@ class GameController(private val gameService: GameService) {
     @ApiResponses(value = [
         ApiResponse(
             responseCode = "201", description = "Game recorded",
-            content = [Content(schema = Schema(implementation = GameCreateRequest::class))]
+            content = [Content(schema = Schema(implementation = Game::class))]
         ),
         ApiResponse(responseCode = "400", description = "Invalid request body", content = [Content()]),
         ApiResponse(responseCode = "404", description = "One or both referenced players do not exist", content = [Content()])
@@ -71,7 +71,7 @@ class GameController(private val gameService: GameService) {
     @ApiResponses(value = [
         ApiResponse(
             responseCode = "200", description = "Game updated",
-            content = [@Content(schema = Schema(implementation = Game::class))]
+            content = [Content(schema = Schema(implementation = Game::class))]
         ),
         ApiResponse(responseCode = "404", description = "Game or referenced player not found", content = [Content()])
     ])
