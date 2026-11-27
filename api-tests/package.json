@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "test:api": "node run-api-tests.mjs",
-    "bru": "cd bruno && bru run players games docs teardown --env local"
+    "bru": "cd bruno && bru run players games player-games docs teardown --env local"
   },
   "engines": {
     "node": ">=20"

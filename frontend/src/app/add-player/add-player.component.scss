@@ -72,6 +72,15 @@
   }
 }
 
+.optional {
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+.field input[type='date'] {
+  color-scheme: dark;
+}
+
 .field-error {
   font-size: 0.8rem;
   color: var(--color-danger);

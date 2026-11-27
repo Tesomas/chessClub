@@ -9,13 +9,18 @@ import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.repository.findByIdOrNull
 import org.tesomas.chessclub.TestFixtures.aPlayer
 import org.tesomas.chessclub.TestcontainersConfiguration
+import org.tesomas.chessclub.config.MongoConfig
 import org.tesomas.chessclub.model.Player
+import java.time.Instant
+import java.time.LocalDate
+import java.util.Date
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 @DataMongoTest
-@Import(TestcontainersConfiguration::class)
+@Import(TestcontainersConfiguration::class, MongoConfig::class)
 class PlayerRepositoryTest {
 
     @Autowired lateinit var playerRepository: PlayerRepository
@@ -63,5 +68,29 @@ class PlayerRepositoryTest {
         // Assert
         assertTrue(existedBefore)
         assertEquals(false, playerRepository.existsById(id))
+    }
+
+    @Test
+    fun `birthDate round-trips and is stored as a BSON date at UTC midnight`() {
+        // Arrange
+        val player = aPlayer(birthDate = LocalDate.of(1990, 11, 30))
+
+        // Act
+        val saved = playerRepository.save(player)
+        val found = playerRepository.findByIdOrNull(requireNotNull(saved.id))
+
+        // Assert
+        assertEquals(LocalDate.of(1990, 11, 30), found?.birthDate)
+        val raw = assertNotNull(mongoTemplate.getCollection("Players").find().first())
+        assertEquals(Date.from(Instant.parse("1990-11-30T00:00:00Z")), raw.getDate("birthDate"))
+    }
+
+    @Test
+    fun `a player without birthDate reads back as null`() {
+        // Act
+        val saved = playerRepository.save(aPlayer(birthDate = null))
+
+        // Assert
+        assertNull(playerRepository.findByIdOrNull(requireNotNull(saved.id))?.birthDate)
     }
 }

@@ -2,6 +2,7 @@ package org.tesomas.chessclub.controller
 
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
+import org.tesomas.chessclub.model.InvalidPlayerGameFilterException
 import org.tesomas.chessclub.service.PlayerNotFoundException
 import kotlin.test.assertEquals
 
@@ -33,5 +34,18 @@ class ApiExceptionHandlerTest {
         // Assert
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), problem.status)
         assertEquals(ApiExceptionHandler.GENERIC_ERROR_DETAIL, problem.detail)
+    }
+
+    @Test
+    fun `InvalidPlayerGameFilterException maps to a 400 ProblemDetail listing the violations`() {
+        // Arrange
+        val ex = InvalidPlayerGameFilterException(listOf("page must be >= 0", "size must be between 1 and 100"))
+
+        // Act
+        val problem = handler.handleInvalidPlayerGameFilter(ex)
+
+        // Assert
+        assertEquals(HttpStatus.BAD_REQUEST.value(), problem.status)
+        assertEquals("Invalid query parameters: page must be >= 0; size must be between 1 and 100", problem.detail)
     }
 }

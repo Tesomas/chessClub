@@ -1,0 +1,21 @@
+meta {
+  name: Filter by partial opponent name, any case
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/api/players/{{pgAliceId}}/games?opponentName=%20brOOK%20
+  body: none
+  auth: none
+}
+
+tests {
+  test("matches Bob on both colours, trimmed and case-insensitive", function() {
+    expect(res.getStatus()).to.equal(200);
+    const content = res.getBody().content;
+    expect(res.getBody().totalElements).to.equal(2);
+    content.forEach((g) => expect(g.opponentName).to.equal("Bob Brooks"));
+    expect(content.map((g) => g.color)).to.eql(["BLACK", "WHITE"]);
+  });
+}

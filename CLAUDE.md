@@ -37,7 +37,7 @@ ChessClub is a Spring Boot 4 + Kotlin + MongoDB backend service, a tool for peop
 ./gradlew testAll
 
 # Docker-free subset (MockK unit tests + @WebMvcTest slices)
-./gradlew test --tests "*ServiceTest" --tests "*ApiExceptionHandlerTest" --tests "*WebTest"
+./gradlew test --tests "*ServiceTest" --tests "*ApiExceptionHandlerTest" --tests "*WebTest" --tests "org.tesomas.chessclub.model.*" --tests "*CriteriaTest"
 
 # Test (single class)
 ./gradlew test --tests "org.tesomas.chessclub.service.GameServiceTest"
@@ -84,18 +84,38 @@ Package root: `org.tesomas.chessclub`
 Standard Spring Boot layering:
 
 ```
-model/       — @Document data classes (Player, Game) + GameType enum
-repository/  — MongoRepository interfaces (PlayerRepository, GameRepository)
-service/     — Business logic (PlayerService, GameService); GameService validates player IDs exist on write
-controller/  — REST controllers under /api/players and /api/games
+model/       — @Document data classes (Player, Game) + enums + player-games DTOs (PlayerGameFilter, PlayerGameView, PageResponse)
+repository/  — MongoRepository interfaces (PlayerRepository, GameRepository) + PlayerGameQueryRepository (MongoTemplate)
+service/     — Business logic (PlayerService, GameService, PlayerGameService); GameService validates player IDs exist on write
+controller/  — REST controllers under /api/players, /api/players/{id}/games and /api/games
 ```
 
 **Domain:**
-- `Player` — club member with first/last name and four ELO fields (rapid, blitz, bullet, classical)
+- `Player` — club member with first/last name, four ELO fields (rapid, blitz, bullet, classical) and an optional `birthDate` (`LocalDate`, JSON `yyyy-MM-dd` or null)
 - `Game` — recorded game linking two player IDs (soft refs), rating snapshots at game time, `GameType` enum, time-control string, date, and PGN string
 - Player IDs in Game are soft references — `GameService` checks `playerRepository.existsById` at create/update time
+- `LocalDate`s are stored as BSON dates at UTC midnight regardless of the server's time zone (driver java.time codecs, `config/MongoConfig`, proven by `MongoConfigTest`), matching `docker/mongo-seed/seed.js`. `@DataMongoTest` slices must `@Import(MongoConfig::class)`. Older builds stored local midnight; that reads back correctly only for data written west of UTC (all ours so far, US Central). Data written by an older build on a server east of UTC sits on the previous UTC day and would need normalizing before use.
+- A self-play game (white and black are the same player) is listed once, viewed from the white side.
 
 **Endpoints:** `GET/POST /api/players`, `GET/PUT/DELETE /api/players/{id}` — same pattern for `/api/games`
+
+`GET /api/players/{id}/games` — the player's games from their perspective, as `PageResponse<PlayerGameView>`
+(`content`, `page`, `size`, `totalElements`, `totalPages`; each item: `gameId`, `date`, `gameType`, `time`, `color`,
+`outcome`, `playerRating`, `opponentId`, `opponentName`, `opponentRating`). Optional query params only:
+`opponentName` (case-insensitive substring of the opponent's denormalized name; trimmed, blank = no filter, max 100
+chars, no control characters; regex-escaped so it is matched literally), `from`/`to` (inclusive ISO dates within
+1900-01-01..9999-12-31), `page` (0-based, default 0),
+`size` (1–100, default 25), `sort` (`date|opponentName`, default `date`; the name sort is case-insensitive via a
+lower-cased computed field, not a collation, so the `$match` can still use the indexes), `direction` (`asc|desc`, default `desc`;
+ties broken by `_id`). Other params are ignored. 404 ProblemDetail for an unknown player, 400 ProblemDetail for invalid
+params. Flow: `PlayerGameController` → `PlayerGameService` (404 check, maps `Game` → `PlayerGameView`) →
+`PlayerGameQueryRepository` (`MongoTemplate` aggregation; `PlayerGameCriteria` builds the `$or` of a white and a black
+branch). Validation lives in `PlayerGameFilter`'s constructor (`InvalidPlayerGameFilterException` → 400).
+Indexes `{whitePlayerId:1,date:-1}` / `{blackPlayerId:1,date:-1}` (`@CompoundIndex` on `Game`, created at startup via
+`spring.data.mongodb.auto-index-creation=true`, and by the seed) let each `$or` branch find the player's games by id
+(and narrow by date range). They do not fully back the sort: the aggregation still sorts the matched games in memory
+(always for `opponentName`, which is computed, and in practice for `date` too). That is fine at club scale (a few
+hundred games per player); a large history would need a different approach.
 
 MongoDB URI defaults to `mongodb://localhost:27017/chessclub`; override with `MONGODB_URI` env var.
 

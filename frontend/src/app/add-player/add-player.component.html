@@ -21,20 +21,44 @@
         }
       </div>
     </div>
+    <div class="form-row">
+      <div class="field">
+        <label for="birthDate">Birth Date <span class="optional">(optional)</span></label>
+        <input
+          id="birthDate"
+          type="date"
+          formControlName="birthDate"
+          autocomplete="bday"
+          [max]="today"
+        />
+        @if (form.controls.birthDate.hasError('future') && form.controls.birthDate.touched) {
+          <span class="field-error">Birth date can't be in the future.</span>
+        }
+      </div>
+    </div>
   </div>
 
   <div class="form-section">
     <h2 class="section-title">ELO Ratings</h2>
     <div class="form-row elo-row">
-      @for (ctrl of [
-        { name: 'rapidElo', label: 'Rapid' },
-        { name: 'blitzElo', label: 'Blitz' },
-        { name: 'bulletElo', label: 'Bullet' },
-        { name: 'classicalElo', label: 'Classical' }
-      ]; track ctrl.name) {
+      @for (
+        ctrl of [
+          { name: 'rapidElo', label: 'Rapid' },
+          { name: 'blitzElo', label: 'Blitz' },
+          { name: 'bulletElo', label: 'Bullet' },
+          { name: 'classicalElo', label: 'Classical' },
+        ];
+        track ctrl.name
+      ) {
         <div class="field">
           <label [for]="ctrl.name">{{ ctrl.label }}</label>
-          <input [id]="ctrl.name" type="number" [formControlName]="ctrl.name" min="100" max="3000" />
+          <input
+            [id]="ctrl.name"
+            type="number"
+            [formControlName]="ctrl.name"
+            min="100"
+            max="3000"
+          />
         </div>
       }
     </div>

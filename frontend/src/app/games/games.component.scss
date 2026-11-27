@@ -107,3 +107,12 @@
   color: var(--color-text-muted);
   font-variant-numeric: tabular-nums;
 }
+
+a.player-name {
+  color: var(--color-text);
+
+  &:hover {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+}

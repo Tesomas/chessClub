@@ -9,14 +9,16 @@ import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.repository.findByIdOrNull
 import org.tesomas.chessclub.TestFixtures.aGame
 import org.tesomas.chessclub.TestcontainersConfiguration
+import org.tesomas.chessclub.config.MongoConfig
 import org.tesomas.chessclub.model.Game
 import org.tesomas.chessclub.model.GameType
 import java.time.LocalDate
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 @DataMongoTest
-@Import(TestcontainersConfiguration::class)
+@Import(TestcontainersConfiguration::class, MongoConfig::class)
 class GameRepositoryTest {
 
     @Autowired lateinit var gameRepository: GameRepository
@@ -74,5 +76,17 @@ class GameRepositoryTest {
         assertEquals(setOf("bob", "carol"), aliceAsWhite.map { it.blackPlayerId }.toSet())
         assertEquals(1, aliceAsBlack.size)
         assertEquals("bob", aliceAsBlack.single().whitePlayerId)
+    }
+
+    @Test
+    fun `compound player-and-date indexes are created on the games collection`() {
+        // Act
+        val keys = mongoTemplate.indexOps(Game::class.java).indexInfo.map { info ->
+            info.indexFields.map { it.key to it.direction?.name }
+        }
+
+        // Assert
+        assertTrue(listOf("whitePlayerId" to "ASC", "date" to "DESC") in keys, "indexes: $keys")
+        assertTrue(listOf("blackPlayerId" to "ASC", "date" to "DESC") in keys, "indexes: $keys")
     }
 }

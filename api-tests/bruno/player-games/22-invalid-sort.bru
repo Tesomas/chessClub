@@ -1,0 +1,21 @@
+meta {
+  name: Removed sort key is rejected
+  type: http
+  seq: 22
+}
+
+get {
+  url: {{baseUrl}}/api/players/{{pgAliceId}}/games?sort=opponentElo
+  body: none
+  auth: none
+}
+
+tests {
+  test("returns 400 ProblemDetail", function() {
+    expect(res.getStatus()).to.equal(400);
+    expect(res.getHeader("content-type")).to.contain("application/problem+json");
+    const body = res.getBody();
+    expect(body.status).to.equal(400);
+    expect(body.detail).to.contain("sort must be one of date, opponentName");
+  });
+}

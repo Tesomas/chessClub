@@ -1,0 +1,19 @@
+meta {
+  name: List Bob's games
+  type: http
+  seq: 20
+}
+
+get {
+  url: {{baseUrl}}/api/players/{{pgBobId}}/games
+  body: none
+  auth: none
+}
+
+tests {
+  test("Bob sees his three games, including the one without Alice", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().totalElements).to.equal(3);
+    expect(res.getBody().content[0].opponentName).to.equal("Carla C. (Castillo)");
+  });
+}

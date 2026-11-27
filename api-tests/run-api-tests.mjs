@@ -23,7 +23,7 @@ const HEALTH_URL = `${BASE_URL}/actuator/health`;
 const STARTUP_TIMEOUT_MS = 180_000;
 const POLL_INTERVAL_MS = 2_000;
 const SHUTDOWN_TIMEOUT_MS = 30_000;
-const BRUNO_FOLDERS = ['players', 'games', 'docs', 'teardown'];
+const BRUNO_FOLDERS = ['players', 'games', 'player-games', 'docs', 'teardown'];
 
 const IS_WINDOWS = process.platform === 'win32';
 const API_TESTS_DIR = path.dirname(fileURLToPath(import.meta.url));

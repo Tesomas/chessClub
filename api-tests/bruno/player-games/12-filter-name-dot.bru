@@ -1,0 +1,20 @@
+meta {
+  name: A dot in the opponent name is not a wildcard
+  type: http
+  seq: 12
+}
+
+get {
+  url: {{baseUrl}}/api/players/{{pgAliceId}}/games?opponentName=b.
+  body: none
+  auth: none
+}
+
+tests {
+  test("'b.' would match 'b ' in 'Bob Brooks' as a regex, but nothing literally", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().totalElements).to.equal(0);
+    expect(res.getBody().totalPages).to.equal(0);
+    expect(res.getBody().content).to.eql([]);
+  });
+}

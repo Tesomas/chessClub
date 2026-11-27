@@ -2,6 +2,7 @@ package org.tesomas.chessclub.controller
 
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
+import io.mockk.slot
 import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,9 +15,12 @@ import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.options
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import org.tesomas.chessclub.TestFixtures.aPlayer
 import org.tesomas.chessclub.model.Player
 import org.tesomas.chessclub.service.PlayerService
+import java.time.LocalDate
 
 @WebMvcTest(PlayerController::class)
 class PlayerControllerWebTest {
@@ -101,6 +105,64 @@ class PlayerControllerWebTest {
             jsonPath("$.rapidElo") { value(1200) }
             jsonPath("$.classicalElo") { value(1200) }
         }
+    }
+
+    @Test
+    fun `POST player with birthDate binds the ISO date and echoes it`() {
+        // Arrange
+        val captured = slot<Player>()
+        every { playerService.create(capture(captured)) } answers { firstArg() }
+
+        // Act + Assert
+        mockMvc.post("/api/players") {
+            contentType = MediaType.APPLICATION_JSON
+            content = """{"firstName":"New","lastName":"Member","birthDate":"1990-11-30"}"""
+        }.andExpect {
+            status { isCreated() }
+            jsonPath("$.birthDate") { value("1990-11-30") }
+        }
+        assertEquals(LocalDate.of(1990, 11, 30), captured.captured.birthDate)
+    }
+
+    @Test
+    fun `POST player without birthDate stores null and serializes it as null`() {
+        // Arrange
+        val captured = slot<Player>()
+        every { playerService.create(capture(captured)) } answers { firstArg() }
+
+        // Act + Assert
+        mockMvc.post("/api/players") {
+            contentType = MediaType.APPLICATION_JSON
+            content = playerJson
+        }.andExpect {
+            status { isCreated() }
+            jsonPath("$.birthDate") { value(null as Any?) }
+        }
+        assertNull(captured.captured.birthDate)
+    }
+
+    @Test
+    fun `GET player serializes birthDate as an ISO date`() {
+        // Arrange
+        every { playerService.findById("p1") } returns aPlayer(id = "p1", birthDate = LocalDate.of(2004, 2, 29))
+
+        // Act + Assert
+        mockMvc.get("/api/players/p1").andExpect {
+            status { isOk() }
+            jsonPath("$.birthDate") { value("2004-02-29") }
+        }
+    }
+
+    @Test
+    fun `POST player with an invalid birthDate returns 400`() {
+        // Act + Assert
+        mockMvc.post("/api/players") {
+            contentType = MediaType.APPLICATION_JSON
+            content = """{"firstName":"New","lastName":"Member","birthDate":"1990-02-30"}"""
+        }.andExpect {
+            status { isBadRequest() }
+        }
+        verify(exactly = 0) { playerService.create(any()) }
     }
 
     @Test

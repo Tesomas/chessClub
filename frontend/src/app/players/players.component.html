@@ -23,10 +23,14 @@
     <tbody>
       @for (player of players(); track player.id) {
         <tr>
-          <td class="player-name">{{ player.firstName }} {{ player.lastName }}</td>
+          <td class="player-name">
+            <a [routerLink]="['/players', player.id]"
+              >{{ player.firstName }} {{ player.lastName }}</a
+            >
+          </td>
           <td>{{ player.rapidElo }}</td>
           <td>{{ player.blitzElo }}</td>
-          <td>{{ player.bulletElo}}</td>
+          <td>{{ player.bulletElo }}</td>
           <td>{{ player.classicalElo }}</td>
         </tr>
       }

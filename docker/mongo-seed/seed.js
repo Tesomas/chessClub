@@ -48,6 +48,20 @@ const LAST_NAMES = [
 
 const PLAYER_COUNT = FIRST_NAMES.length;
 
+// Every other player (even index) gets a birth date; the rest have none, like real sign-ups.
+const BIRTH_YEAR_MIN = 1955;
+const BIRTH_YEAR_SPAN = 56; // 1955..2010
+
+// Derived from the index rather than the PRNG so adding birth dates leaves the game history unchanged.
+// Stored as a BSON Date at UTC midnight, which is how the app stores LocalDate (see MongoConfig).
+function birthDate(index) {
+  if (index % 2 !== 0) return null;
+  const year = BIRTH_YEAR_MIN + ((index * 7) % BIRTH_YEAR_SPAN);
+  const month = (index * 5) % 12; // 0-based for Date.UTC
+  const day = 1 + ((index * 11) % 28); // 1..28 is valid in every month
+  return new Date(Date.UTC(year, month, day));
+}
+
 // mulberry32: small deterministic PRNG returning floats in [0, 1).
 function createRandom(seed) {
   let state = seed >>> 0;
@@ -194,14 +208,18 @@ function seed() {
     GAME_TYPES.forEach((gt) => {
       doc[gt.field] = finalRatings[gt.field][i];
     });
+    const born = birthDate(i);
+    if (born) doc.birthDate = born;
     doc._class = PLAYER_CLASS;
     return doc;
   });
 
   database[PLAYER_COLLECTION].insertMany(playerDocs);
   database[GAME_COLLECTION].insertMany(games);
-  database[GAME_COLLECTION].createIndex({ whitePlayerId: 1 });
-  database[GAME_COLLECTION].createIndex({ blackPlayerId: 1 });
+  // Same keys and (default) names as the @CompoundIndex declarations on Game, so the app's
+  // auto-index-creation finds them already in place. They serve GET /api/players/{id}/games.
+  database[GAME_COLLECTION].createIndex({ whitePlayerId: 1, date: -1 });
+  database[GAME_COLLECTION].createIndex({ blackPlayerId: 1, date: -1 });
 
   print(
     "[seed] Inserted " + playerDocs.length + " players and " + games.length +

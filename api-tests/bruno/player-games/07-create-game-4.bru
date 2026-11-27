@@ -1,0 +1,32 @@
+meta {
+  name: Create game 4
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/games
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "whitePlayerId": "{{pgAliceId}}",
+    "blackPlayerId": "{{pgCarlaId}}",
+    "gameType": "RAPID",
+    "result": "DRAW",
+    "time": "10+0",
+    "date": "2026-10-04"
+  }
+}
+
+script:post-response {
+  bru.setVar("pgGame4Id", res.getBody().id);
+}
+
+tests {
+  test("returns 201", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+}

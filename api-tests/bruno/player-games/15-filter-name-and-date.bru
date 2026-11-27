@@ -1,0 +1,21 @@
+meta {
+  name: Opponent name combined with a one-day range
+  type: http
+  seq: 15
+}
+
+get {
+  url: {{baseUrl}}/api/players/{{pgAliceId}}/games?opponentName=carla&from=2026-10-04&to=2026-10-04
+  body: none
+  auth: none
+}
+
+tests {
+  test("keeps only the draw against Carla on that day", function() {
+    expect(res.getStatus()).to.equal(200);
+    const content = res.getBody().content;
+    expect(content.length).to.equal(1);
+    expect(content[0].gameId).to.equal(bru.getVar("pgGame4Id"));
+    expect(content[0].outcome).to.equal("DRAW");
+  });
+}

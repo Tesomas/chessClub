@@ -2,10 +2,19 @@ package org.tesomas.chessclub.model
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.index.CompoundIndex
+import org.springframework.data.mongodb.core.index.CompoundIndexes
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDate
 
 @Document(collection = "games")
+// Index names equal MongoDB's defaults so they coexist with the ones docker/mongo-seed/seed.js creates.
+// They serve the per-colour $or branches of GET /api/players/{id}/games (player id, then date range); the
+// endpoint's sort itself is still done in memory, which is fine at club scale.
+@CompoundIndexes(
+    CompoundIndex(name = "whitePlayerId_1_date_-1", def = "{'whitePlayerId': 1, 'date': -1}"),
+    CompoundIndex(name = "blackPlayerId_1_date_-1", def = "{'blackPlayerId': 1, 'date': -1}")
+)
 @Schema(description = "A recorded chess game between two club members")
 data class Game(
     @Id

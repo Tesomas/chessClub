@@ -1,0 +1,119 @@
+.filters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: end;
+  gap: var(--space-md) var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.field {
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  min-width: 0;
+
+  label,
+  legend {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-xs);
+  }
+}
+
+input {
+  width: 100%;
+  min-width: 0;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  color-scheme: dark;
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 7px var(--space-sm);
+  font-variant-numeric: tabular-nums;
+  transition: border-color var(--duration) var(--ease);
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-accent);
+  }
+}
+
+.search {
+  position: relative;
+
+  input {
+    padding-left: 30px;
+  }
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.range {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.range-sep {
+  color: var(--color-text-muted);
+}
+
+.invalid input {
+  border-color: var(--color-danger);
+}
+
+.range-error {
+  font-size: 0.78rem;
+  color: var(--color-danger);
+}
+
+.btn-reset {
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 7px var(--space-md);
+  cursor: pointer;
+  transition:
+    color var(--duration) var(--ease),
+    border-color var(--duration) var(--ease);
+
+  &:hover:not(:disabled) {
+    color: var(--color-text);
+    border-color: var(--color-accent);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+}
+
+@media (max-width: 720px) {
+  .filters {
+    grid-template-columns: 1fr;
+    padding: var(--space-md);
+  }
+
+  .btn-reset {
+    justify-self: end;
+  }
+}

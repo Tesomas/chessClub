@@ -15,6 +15,12 @@ export const routes: Routes = [
       import('./add-player/add-player.component').then((m) => m.AddPlayerComponent),
   },
   {
+    // After 'players/add' so that path isn't captured as an id.
+    path: 'players/:id',
+    loadComponent: () =>
+      import('./player-profile/player-profile.component').then((m) => m.PlayerProfileComponent),
+  },
+  {
     path: 'games',
     loadComponent: () => import('./games/games.component').then((m) => m.GamesComponent),
   },

@@ -1,0 +1,36 @@
+meta {
+  name: Create player Alice Anders
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/players
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "firstName": "Alice",
+    "lastName": "Anders",
+    "blitzElo": 1500,
+    "rapidElo": 1550,
+    "birthDate": "1990-11-30"
+  }
+}
+
+script:post-response {
+  bru.setVar("pgAliceId", res.getBody().id);
+}
+
+tests {
+  test("returns 201 with an id", function() {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().id).to.be.a("string").and.not.empty;
+  });
+
+  test("birthDate is echoed (null when omitted)", function() {
+    expect(res.getBody().birthDate).to.equal("1990-11-30");
+  });
+}

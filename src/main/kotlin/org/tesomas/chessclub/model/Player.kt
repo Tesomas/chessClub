@@ -3,6 +3,7 @@ package org.tesomas.chessclub.model
 import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
+import java.time.LocalDate
 
 @Document(collection = "Players")
 @Schema(description = "Chess club member with ELO ratings across time controls")
@@ -27,5 +28,8 @@ data class Player(
     val bulletElo: Int = 1200,
 
     @Schema(description = "Classical chess ELO rating", example = "2860", minimum = "0", maximum = "3500")
-    val classicalElo: Int = 1200
+    val classicalElo: Int = 1200,
+
+    @Schema(description = "Player's date of birth (ISO yyyy-MM-dd); optional", example = "1990-11-30", nullable = true)
+    val birthDate: LocalDate? = null
 )
