@@ -2,6 +2,8 @@ package org.tesomas.chessclub.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.data.mongodb.MongoDatabaseFactory
+import org.springframework.data.mongodb.MongoTransactionManager
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions
 
 /**
@@ -9,6 +11,10 @@ import org.springframework.data.mongodb.core.convert.MongoCustomConversions
  * UTC midnight regardless of the server's time zone. Spring Data's default converts via the
  * system zone, which made dates written by `docker/mongo-seed/seed.js` (UTC midnight) read back a
  * day early west of UTC and shifted date-range queries.
+ *
+ * Also registers the [MongoTransactionManager] behind `@Transactional` (Spring Boot does not auto-configure
+ * one for MongoDB). Multi-document transactions need a replica set: the Testcontainers MongoDB and the
+ * `mongo-seed` image both run as a single-node one.
  *
  * `@DataMongoTest` slices do not pick this up automatically; import it there.
  */
@@ -18,4 +24,8 @@ class MongoConfig {
     @Bean
     fun mongoCustomConversions(): MongoCustomConversions =
         MongoCustomConversions.create { it.useNativeDriverJavaTimeCodecs() }
+
+    @Bean
+    fun transactionManager(databaseFactory: MongoDatabaseFactory): MongoTransactionManager =
+        MongoTransactionManager(databaseFactory)
 }

@@ -3,6 +3,7 @@ package org.tesomas.chessclub.service
 import org.apache.logging.log4j.LogManager
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import org.tesomas.chessclub.model.Game
 import org.tesomas.chessclub.model.GameCreateRequest
 import org.tesomas.chessclub.model.GameType
@@ -31,7 +32,12 @@ class GameService(
      * Records the game and applies its ELO result: the game stores both players' ratings before the game
      * plus the points each gained or lost, and both players' rating for the game's type is updated.
      * A self-play game (same player on both sides) is recorded without changing any rating.
+     *
+     * Runs in one MongoDB transaction: the game and both rating updates are committed together or not at all.
+     * The players are read inside the transaction too, so two games saved at the same moment for the same
+     * player cannot both start from the old rating; the later one fails with a write conflict instead.
      */
+    @Transactional
     fun create(request: GameCreateRequest): Game {
         val (white, black) = resolvePlayers(request.whitePlayerId, request.blackPlayerId)
         val whiteRating = white.eloForType(request.gameType)
