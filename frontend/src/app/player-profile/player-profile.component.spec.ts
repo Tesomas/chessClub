@@ -93,7 +93,8 @@ describe('PlayerProfileComponent', () => {
     await open('/players/p1');
     const avatar = el.querySelector('.avatar');
     expect(avatar?.getAttribute('role')).toBe('img');
-    expect(avatar?.getAttribute('aria-label')).toContain('placeholder');
+    expect(avatar?.getAttribute('aria-label')).toBe('Profile picture placeholder for Ann Lee');
+    expect(avatar?.hasAttribute('aria-hidden')).toBe(false);
     expect(text('.avatar')).toBe('AL');
     expect(text('h1')).toBe('Ann Lee');
     expect(text('.age')).toBe('Age 35');

@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.tesomas.chessclub.TestFixtures.aGame
 import org.tesomas.chessclub.TestFixtures.aGameRequest
 import org.tesomas.chessclub.TestFixtures.aPlayer
@@ -21,6 +22,8 @@ import org.tesomas.chessclub.repository.GameRepository
 import org.tesomas.chessclub.repository.PlayerRepository
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestRestTemplate
@@ -156,5 +159,72 @@ class GameControllerTest {
             Void::class.java
         )
         assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
+    }
+
+    // --- PGN size limit ----------------------------------------------------------------------
+
+    @Test
+    fun `POST game with a pgn of exactly 65536 characters is stored intact`() {
+        // Arrange
+        val pgn = "x".repeat(65_536)
+
+        // Act
+        val response = restTemplate.postForEntity("/api/games", testRequest().copy(pgn = pgn), Game::class.java)
+
+        // Assert
+        assertEquals(HttpStatus.CREATED, response.statusCode)
+        assertEquals(pgn, gameRepository.findAll().single().pgn)
+    }
+
+    @Test
+    fun `POST game with a pgn of 65537 characters returns 400 ProblemDetail and stores nothing`() {
+        // Act
+        val response = restTemplate.postForEntity(
+            "/api/games", testRequest().copy(pgn = "x".repeat(65_537)), String::class.java
+        )
+
+        // Assert
+        assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
+        assertTrue(response.headers.contentType?.isCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON) == true)
+        assertTrue(response.body?.contains("pgn must be at most 65536 characters") == true, response.body)
+        assertEquals(0, gameRepository.count())
+    }
+
+    @Test
+    fun `POST game without a pgn is still accepted`() {
+        val response = restTemplate.postForEntity("/api/games", testRequest().copy(pgn = null), Game::class.java)
+        assertEquals(HttpStatus.CREATED, response.statusCode)
+        assertNull(response.body?.pgn)
+    }
+
+    @Test
+    fun `PUT game with a pgn of 65537 characters returns 400 and leaves the game unchanged`() {
+        // Arrange
+        val saved = gameRepository.save(testGame())
+
+        // Act
+        val response = restTemplate.exchange(
+            "/api/games/${saved.id}", HttpMethod.PUT, HttpEntity(saved.copy(pgn = "x".repeat(65_537))), String::class.java
+        )
+
+        // Assert
+        assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
+        assertEquals(saved.pgn, gameRepository.findAll().single().pgn)
+    }
+
+    @Test
+    fun `PUT game with a pgn of exactly 65536 characters succeeds`() {
+        // Arrange
+        val saved = gameRepository.save(testGame())
+        val pgn = "y".repeat(65_536)
+
+        // Act
+        val response = restTemplate.exchange(
+            "/api/games/${saved.id}", HttpMethod.PUT, HttpEntity(saved.copy(pgn = pgn)), Game::class.java
+        )
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.statusCode)
+        assertEquals(pgn, gameRepository.findAll().single().pgn)
     }
 }

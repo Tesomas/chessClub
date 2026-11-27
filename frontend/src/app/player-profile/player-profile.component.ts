@@ -32,6 +32,7 @@ import {
 import { isFilterValid, queryFromParamMap, queryToRouteParams } from '../player-game-query';
 import { ageFrom } from '../age';
 import { GameFilterComponent } from './game-filter/game-filter.component';
+import { PlayerAvatarComponent } from '../shared/player-avatar/player-avatar.component';
 import {
   PlayerGamesTableComponent,
   SortChange,
@@ -78,7 +79,7 @@ function problemDetail(error: unknown): string | null {
 
 @Component({
   selector: 'app-player-profile',
-  imports: [RouterLink, GameFilterComponent, PlayerGamesTableComponent],
+  imports: [RouterLink, GameFilterComponent, PlayerGamesTableComponent, PlayerAvatarComponent],
   templateUrl: './player-profile.component.html',
   styleUrl: './player-profile.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -139,9 +140,9 @@ export class PlayerProfileComponent {
     const player = this.player();
     return player ? ageFrom(player.birthDate, this.today()) : null;
   });
-  protected readonly initials = computed(() => {
+  protected readonly fullName = computed(() => {
     const player = this.player();
-    return player ? `${player.firstName.charAt(0)}${player.lastName.charAt(0)}`.toUpperCase() : '';
+    return player ? `${player.firstName} ${player.lastName}` : '';
   });
   protected readonly ratings = computed(() => {
     const player = this.player();

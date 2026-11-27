@@ -39,6 +39,10 @@ ChessClub is a Spring Boot 4 + Kotlin + MongoDB backend service, a tool for peop
 # Docker-free subset (MockK unit tests + @WebMvcTest slices)
 ./gradlew test --tests "*ServiceTest" --tests "*ApiExceptionHandlerTest" --tests "*WebTest" --tests "org.tesomas.chessclub.model.*" --tests "*CriteriaTest"
 
+# Seed script tests (Docker-free; runs seed.js against a stubbed mongosh db). Node 22 needs the quoted glob:
+# a bare directory argument (node --test docker/mongo-seed/) is treated as a module path and fails.
+node --test "docker/mongo-seed/*.test.mjs"
+
 # Test (single class)
 ./gradlew test --tests "org.tesomas.chessclub.service.GameServiceTest"
 
@@ -92,7 +96,8 @@ controller/  — REST controllers under /api/players, /api/players/{id}/games an
 
 **Domain:**
 - `Player` — club member with first/last name, four ELO fields (rapid, blitz, bullet, classical) and an optional `birthDate` (`LocalDate`, JSON `yyyy-MM-dd` or null)
-- `Game` — recorded game linking two player IDs (soft refs), rating snapshots at game time, `GameType` enum, time-control string, date, and PGN string
+- `Game` — recorded game linking two player IDs (soft refs), rating snapshots at game time, `GameType` enum, time-control string, date, and PGN string. `pgn` is optional (null allowed) but at most 65,536 characters (UTF-16 code units, i.e. `String.length`; not bytes, so the UTF-8 size can be larger and an emoji counts as 2) (`GameService.MAX_PGN_LENGTH`); POST/PUT `/api/games` with a longer one returns a 400 ProblemDetail (`InvalidGameException`) before any lookup. It is stored and returned byte-for-byte.
+- Seed data (`docker/mongo-seed/seed.js`): every seeded game has a PGN with headers built from the seeded game (names, date, result, Elo snapshots, `TimeControl` in seconds) and move text taken from a pool of 30 real public-domain historical games picked by result. The moves are demo data: they do not correspond to the seeded players, ratings or time controls. The pool was checked once with chess.js (all moves legal); `seed.test.mjs` pins everything else about the seeded data via a fingerprint.
 - Player IDs in Game are soft references — `GameService` checks `playerRepository.existsById` at create/update time
 - `LocalDate`s are stored as BSON dates at UTC midnight regardless of the server's time zone (driver java.time codecs, `config/MongoConfig`, proven by `MongoConfigTest`), matching `docker/mongo-seed/seed.js`. `@DataMongoTest` slices must `@Import(MongoConfig::class)`. Older builds stored local midnight; that reads back correctly only for data written west of UTC (all ours so far, US Central). Data written by an older build on a server east of UTC sits on the previous UTC day and would need normalizing before use.
 - A self-play game (white and black are the same player) is listed once, viewed from the white side.

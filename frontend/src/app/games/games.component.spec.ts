@@ -5,7 +5,7 @@ import { provideRouter } from '@angular/router';
 import { GamesComponent } from './games.component';
 
 describe('GamesComponent', () => {
-  it('links white and black player names to their profiles', async () => {
+  it('links player names to profiles and the date to the game page', async () => {
     TestBed.configureTestingModule({
       imports: [GamesComponent],
       providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
@@ -38,5 +38,13 @@ describe('GamesComponent', () => {
       ['Ann Lee', '/players/w1'],
       ['Bob Brooks', '/players/b1'],
     ]);
+    const gameLink = (fixture.nativeElement as HTMLElement).querySelector<HTMLAnchorElement>(
+      'td.date-cell a.game-link',
+    );
+    expect(gameLink?.textContent?.trim()).toBe('2026-10-01');
+    expect(gameLink?.getAttribute('href')).toBe('/games/g1');
+    expect(gameLink?.getAttribute('aria-label')).toBe(
+      'View game on 2026-10-01: Ann Lee vs Bob Brooks',
+    );
   });
 });

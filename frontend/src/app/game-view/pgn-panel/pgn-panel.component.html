@@ -1,0 +1,43 @@
+<section class="pgn" aria-labelledby="pgn-heading">
+  <header class="pgn-header">
+    <h2 id="pgn-heading">PGN</h2>
+    @if (hasPgn()) {
+      <button type="button" class="copy-btn" (click)="copy()">Copy PGN</button>
+    }
+  </header>
+  <p class="copy-status" role="status" aria-live="polite">{{ copyMessage() }}</p>
+
+  @if (!hasPgn()) {
+    <p class="pgn-empty">No PGN recorded</p>
+  } @else if (parsed(); as game) {
+    @if (game.headers.length) {
+      <dl class="tags">
+        @for (header of game.headers; track $index) {
+          <div>
+            <dt>{{ header.name }}</dt>
+            <dd>{{ header.value }}</dd>
+          </div>
+        }
+      </dl>
+    }
+    @if (game.moves.length) {
+      <ol class="moves" aria-label="Moves" [style.--move-no-ch]="moveNumberWidth()">
+        @for (move of game.moves; track $index) {
+          <li>
+            <!-- &ngsp; keeps real spaces so assistive tech reads "1. e4 e5", not "1.e4e5" -->
+            <span class="move-no">{{ move.number }}.</span>&ngsp;<span class="ply">{{
+              move.white ?? '…'
+            }}</span
+            >&ngsp;<span class="ply">{{ move.black ?? '' }}</span>
+          </li>
+        }
+      </ol>
+    }
+    @if (game.result) {
+      <p class="pgn-result">{{ game.result }}</p>
+    }
+  } @else {
+    <p class="pgn-fallback">Couldn't read this PGN, so it's shown exactly as recorded.</p>
+    <pre class="pgn-raw">{{ pgn() }}</pre>
+  }
+</section>

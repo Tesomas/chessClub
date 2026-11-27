@@ -94,6 +94,16 @@ describe('PlayerGamesTableComponent', () => {
     expect(badges.map((b) => b.getAttribute('title'))).toEqual(['Win', 'Loss', 'Draw']);
   });
 
+  it('links the date to the game page with a descriptive label', async () => {
+    await render(page([game({ gameId: 'g42', date: '2026-03-04', opponentName: 'Zed Zhou' })]));
+    const link = el.querySelector<HTMLAnchorElement>('td a.game-link');
+    expect(link?.textContent?.trim()).toBe('2026-03-04');
+    expect(link?.getAttribute('href')).toBe('/games/g42');
+    expect(link?.getAttribute('aria-label')).toBe('View game on 2026-03-04 against Zed Zhou');
+    // the opponent link is still separate
+    expect(el.querySelectorAll('tbody tr a')).toHaveLength(2);
+  });
+
   it('links the opponent to their profile', async () => {
     await render(page([game({ opponentId: 'p9', opponentName: 'Zed Zhou' })]));
     const link = el.querySelector<HTMLAnchorElement>('td a.opponent');

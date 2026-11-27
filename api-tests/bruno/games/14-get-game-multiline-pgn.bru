@@ -1,0 +1,37 @@
+meta {
+  name: Get game with a multi-line PGN
+  type: http
+  seq: 14
+}
+
+get {
+  url: {{baseUrl}}/api/games/{{pgnGameId}}
+  body: none
+  auth: none
+}
+
+tests {
+  // Must stay identical to the pgn sent in 13-create-game-multiline-pgn.bru
+  const expected = "[Event \"Club Championship\"]\n[Site \"ChessClub\"]\n[Date \"2024.11.27\"]\n[White \"Carlsen, Magnus\"]\n[Black \"Nakamura, Hikaru\"]\n[Result \"1-0\"]\n\n1. e4 e5 2. Nf3 d6 {Philidor's defence, \"solid\" but passive} 3. d4 Bg4\n4. dxe5 Bxf3 5. Qxf3 dxe5 6. Bc4 Nf6 7. Qb3 Qe7 8. Nc3 c6 9. Bg5 b5 {Zoë's\nfavourite blunder}\r\n10. Nxb5 cxb5 11. Bxb5+ Nbd7 12. O-O-O Rd8 13. Rxd7 Rxd7 14. Rd1 Qe6\n15. Bxd7+ Nxd7 16. Qb8+ Nxb8 17. Rd8# 1-0\n";
+
+  test("returns 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("returns the pgn byte-identical: headers, comments, quotes, CRLF, non-ASCII and trailing newline", function() {
+    const pgn = res.getBody().pgn;
+    expect(pgn).to.equal(expected);
+    expect(pgn.length).to.equal(expected.length);
+    expect(pgn).to.contain("\r\n");
+    expect(pgn).to.contain("{Zoë's\nfavourite blunder}");
+    expect(pgn.endsWith("1-0\n")).to.equal(true);
+  });
+
+  test("keeps the rest of the game intact", function() {
+    const body = res.getBody();
+    expect(body.whitePlayerName).to.equal("Magnus Carlsen");
+    expect(body.blackPlayerName).to.equal("Hikaru Nakamura");
+    expect(body.result).to.equal("WHITE_WINS");
+    expect(body.time).to.equal("90+30");
+  });
+}

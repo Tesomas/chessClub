@@ -44,6 +44,10 @@ export class GameService {
     return this.http.get<Game[]>('/api/games');
   }
 
+  getById(id: string): Observable<Game> {
+    return this.http.get<Game>(`/api/games/${encodeURIComponent(id)}`);
+  }
+
   create(dto: GameCreateDto): Observable<Game> {
     return this.http.post<Game>('/api/games', dto);
   }

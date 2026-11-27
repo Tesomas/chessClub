@@ -120,29 +120,14 @@
   }
 }
 
-.badge {
-  display: inline-grid;
-  place-items: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 6px;
-  font-size: 0.78rem;
-  font-weight: 700;
-}
-
-.badge-win {
-  background: rgb(76 175 110 / 18%);
-  color: #6fd394;
-}
-
-.badge-loss {
-  background: rgb(224 85 85 / 18%);
-  color: #f08080;
-}
-
-.badge-draw {
-  background: rgb(136 136 153 / 20%);
+.game-link {
   color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--color-accent);
+  }
 }
 
 .empty {

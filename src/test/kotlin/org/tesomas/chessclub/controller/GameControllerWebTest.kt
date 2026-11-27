@@ -2,6 +2,7 @@ package org.tesomas.chessclub.controller
 
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
+import io.mockk.slot
 import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,6 +19,7 @@ import org.tesomas.chessclub.TestFixtures.aGame
 import org.tesomas.chessclub.model.Game
 import org.tesomas.chessclub.model.GameCreateRequest
 import org.tesomas.chessclub.service.GameService
+import org.tesomas.chessclub.service.InvalidGameException
 import org.tesomas.chessclub.service.PlayerNotFoundException
 
 @WebMvcTest(GameController::class)
@@ -215,6 +217,57 @@ class GameControllerWebTest {
 
         // Act + Assert
         mockMvc.delete("/api/games/missing").andExpect { status { isNotFound() } }
+    }
+
+    @Test
+    fun `POST game with an oversized pgn returns 400 ProblemDetail`() {
+        // Arrange
+        every { gameService.create(any()) } throws InvalidGameException("pgn must be at most 65536 characters")
+
+        // Act + Assert
+        mockMvc.post("/api/games") {
+            contentType = MediaType.APPLICATION_JSON
+            content = gameJson
+        }.andExpect {
+            status { isBadRequest() }
+            content { contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON) }
+            jsonPath("$.status") { value(400) }
+            jsonPath("$.detail") { value("pgn must be at most 65536 characters") }
+        }
+    }
+
+    @Test
+    fun `PUT game with an oversized pgn returns 400 ProblemDetail`() {
+        // Arrange
+        every { gameService.update("g1", any()) } throws InvalidGameException("pgn must be at most 65536 characters")
+
+        // Act + Assert
+        mockMvc.put("/api/games/g1") {
+            contentType = MediaType.APPLICATION_JSON
+            content = putJson
+        }.andExpect {
+            status { isBadRequest() }
+            content { contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON) }
+            jsonPath("$.detail") { value("pgn must be at most 65536 characters") }
+        }
+    }
+
+    @Test
+    fun `POST game passes a large multi-line pgn through to the service unchanged`() {
+        // Arrange
+        val pgn = "[Event \"Club\"]\n\n1. e4 {best by test} e5\r\n2. Nf3 *" + " ".repeat(60_000)
+        val captured = slot<GameCreateRequest>()
+        every { gameService.create(capture(captured)) } answers { created(firstArg(), "new-id") }
+
+        // Act
+        mockMvc.post("/api/games") {
+            contentType = MediaType.APPLICATION_JSON
+            content = """{"whitePlayerId":"w1","blackPlayerId":"b1","gameType":"BLITZ","result":"DRAW",
+                "time":"3+2","date":"2024-11-25","pgn":${tools.jackson.databind.json.JsonMapper().writeValueAsString(pgn)}}"""
+        }.andExpect { status { isCreated() } }
+
+        // Assert
+        kotlin.test.assertEquals(pgn, captured.captured.pgn)
     }
 
     @Test

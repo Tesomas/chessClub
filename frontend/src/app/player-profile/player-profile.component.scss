@@ -20,27 +20,8 @@
   border-bottom: 1px solid var(--color-border);
 }
 
-.avatar {
+.profile-avatar {
   grid-area: avatar;
-  width: 96px;
-  height: 96px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-size: 2rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: var(--color-accent);
-  background: radial-gradient(
-    circle at 30% 25%,
-    var(--color-surface-raised),
-    var(--color-surface) 70%
-  );
-  box-shadow:
-    0 0 0 2px var(--color-bg),
-    0 0 0 4px var(--color-accent-dim),
-    0 12px 30px rgb(0 0 0 / 40%);
-  user-select: none;
 }
 
 .identity {
@@ -156,10 +137,8 @@
 }
 
 @media (max-width: 520px) {
-  .avatar {
-    width: 72px;
-    height: 72px;
-    font-size: 1.5rem;
+  .profile-avatar {
+    --avatar-size: 72px;
   }
 
   .elo-grid {

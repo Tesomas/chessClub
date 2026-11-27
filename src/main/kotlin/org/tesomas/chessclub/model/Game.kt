@@ -51,7 +51,7 @@ data class Game(
     @Schema(description = "Date the game was played", example = "2024-11-25")
     val date: LocalDate,
       
-    @Schema(description = "Portable Game Notation (PGN) of the full game", example = "1. e4 e5 2. Nf3 Nc6 3. Bb5 *")
+    @Schema(description = "Portable Game Notation (PGN) of the full game; at most 65,536 characters (UTF-16 code units)", example = "1. e4 e5 2. Nf3 Nc6 3. Bb5 *", maxLength = 65536)
     val pgn: String? = null
 
 )

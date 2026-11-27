@@ -1,0 +1,38 @@
+meta {
+  name: Update game with an oversized PGN
+  type: http
+  seq: 16
+}
+
+put {
+  url: {{baseUrl}}/api/games/{{pgnGameId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "whitePlayerId": "{{whiteId}}",
+    "blackPlayerId": "{{blackId}}",
+    "whitePlayerRating": 2850,
+    "blackPlayerRating": 2800,
+    "gameType": "CLASSICAL",
+    "result": "WHITE_WINS",
+    "time": "90+30",
+    "date": "2024-11-27",
+    "pgn": "replaced by the pre-request script"
+  }
+}
+
+script:pre-request {
+  const body = req.getBody();
+  req.setBody({ ...body, pgn: "x".repeat(65537) });
+}
+
+tests {
+  test("returns 400 ProblemDetail naming the limit", function() {
+    expect(res.getStatus()).to.equal(400);
+    expect(res.getHeader("content-type")).to.contain("application/problem+json");
+    expect(res.getBody().detail).to.equal("pgn must be at most 65536 characters");
+  });
+}
